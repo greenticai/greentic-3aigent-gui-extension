@@ -44,8 +44,11 @@ pretending.
 .
 ├── README.md
 ├── .gitignore
-├── docs/anatomy.md                     ← this file
+├── docs/                               ← getting-started, anatomy (this file), deploying
+├── .github/workflows/ci.yml            ← build + validate on every PR
+├── .github/workflows/release.yml       ← publish to the store on a version bump
 ├── ci/stamp-gtpack-sha.sh              ← writes the runtime digest into the manifest
+├── ci/check-version-sync.sh            ← fails when the three version copies drift
 ├── scripts/verify-wit-sync.sh          ← guards the vendored WIT copies
 ├── wit/                                ← vendored contract (see §3)
 │   ├── extension-base.wit
@@ -169,16 +172,19 @@ are for tooling and inspection; the component serves its own embedded copy.
 fn get_identity() -> types::ExtensionIdentity {
     types::ExtensionIdentity {
         id: "greentic.provider.aigent-gui".into(),
-        version: "0.2.1".into(),
+        version: "0.2.2".into(),
         kind: types::Kind::Provider,
     }
 }
 ```
 
 Called first, by the designer, to identify the extension. **These two strings are
-duplicated in `describe.json`** (`metadata.id`, `metadata.version`) and nothing
-in the build checks that they agree. Keep them in sync by hand; a mismatch means
-the manifest advertises one version and the component reports another.
+restated in `describe.json`** (`metadata.id`, `metadata.version`), and a third
+time in `Cargo.toml`. A mismatch is not cosmetic: `metadata.version` is what gtdx
+publishes, so bumping only one of them ships the wrong version.
+
+`ci/check-version-sync.sh` compares all three and fails the build when they
+disagree; CI runs it on every PR. Bump them together.
 
 ```rust
 fn get_offered() -> Vec<types::CapabilityRef> {
@@ -279,7 +285,7 @@ version gtdx publishes at** — not the version in `Cargo.toml`.
   "metadata": {
     "id": "greentic.provider.aigent-gui",
     "name": "3AIgent GUI",
-    "version": "0.2.1",                 // ← the published version
+    "version": "0.2.2",                 // ← the published version
     "summary": "...",
     "author": { "name": "Greentic", "email": "team@greentic.ai" },
     "license": "MIT",
@@ -556,8 +562,9 @@ nothing about what actually ships.
 
 - `assets/icon.svg` is a 388-byte placeholder. Real 3AIgent artwork is needed;
   the brand asset that exists today is a PNG.
-- `get_identity()` in `src/lib.rs` and `metadata` in `describe.json` restate the
-  same id and version with no check that they agree. The sibling repository grew
-  a `ci/check-version-sync.sh` for exactly this class of drift; this repo has no
-  equivalent yet.
-- There is no CI workflow here. Every check in §12 is manual.
+- The vendored WIT is guarded by a hand-rolled `scripts/verify-wit-sync.sh`
+  against a pinned upstream rev. `gtdx new` now scaffolds a first-class
+  `.gtdx-contract.lock` that does the same job by digest — worth converging on.
+- The published extension embeds a **placeholder** runtime `.gtpack`, staged by
+  `release.yml`. It installs cleanly and serves its schemas, but cannot deliver a
+  message. Wiring a real pack into the release is the outstanding work.
