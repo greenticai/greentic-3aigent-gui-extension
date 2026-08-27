@@ -475,6 +475,8 @@ grep for the old id before you call it done.
 
 ## 11. Install
 
+Full deployment guide, local and store: [`deploying.md`](deploying.md).
+
 ```bash
 GREENTIC_EXT_ALLOW_UNSIGNED=1 gtdx install \
   ./provider-3aigent-gui/greentic.provider.3aigent-gui-<version>.gtxpack \
