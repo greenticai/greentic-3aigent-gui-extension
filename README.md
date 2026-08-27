@@ -4,6 +4,10 @@ The 3AIgent GUI provider, packaged as a Greentic **provider extension**.
 
 A provider extension is a WASM component implementing `greentic:extension-provider`, packaged into a `.gtxpack` alongside an embedded runtime `.gtpack`. `greentic-designer` reads the extension to learn what channels exist and what config and secrets they need; `greentic-runner` executes the embedded runtime pack.
 
+For a file-by-file and line-by-line reading — what every file is for, what each
+function in `src/lib.rs` answers, and how to build a new provider extension from
+this one as a template — see [`docs/anatomy.md`](docs/anatomy.md).
+
 ## What it offers
 
 | | |
@@ -54,7 +58,7 @@ Builds are unsigned unless `GREENTIC_EXT_SIGNING_KEY_PEM` is set.
 cd provider-3aigent-gui-tests && cargo test
 ```
 
-Validates `describe.json` and the JSON schemas.
+13 tests validating `describe.json` and the JSON schemas.
 
 ## The vendored WIT contract
 
@@ -75,4 +79,5 @@ siblings — expect to bump both.
 ## Known gaps
 
 - `provider-3aigent-gui/assets/icon.svg` is a placeholder. Real 3AIgent artwork is needed; the brand asset that exists today is a PNG.
-- The WIT package name is `greentic:provider-aigent-gui-extension`, without the `3`. The component-model label grammar forbids a dash-separated word beginning with a digit, so `3aigent` cannot appear there. Every user-visible identifier keeps it.
+- The WIT package name is `greentic:provider-aigent-gui-extension`, without the `3`. Every user-visible identifier keeps it. The stated reason used to be that the component-model label grammar forbids a dash-separated word beginning with a digit — that is too broad. Only the *first* character of a label is constrained: `greentic:3aigent-gui-extension` is rejected, but `greentic:provider-3aigent-gui-extension` is accepted. Dropping the `3` was not forced by the grammar.
+- The repo is at `apiVersion: greentic.ai/v1` and cannot be published or installed by a current `gtdx`, which requires v2. The published `0.2.0` also carries a different id (`greentic.provider.aigent-gui`). See [Known divergences](docs/anatomy.md#12-known-divergences-between-this-repo-and-the-published-extension).
