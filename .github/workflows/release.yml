@@ -1,0 +1,174 @@
+name: Release
+
+# Publishes greentic.provider.aigent-gui to the Greentic Store when
+# describe.json metadata.version changes on main, then pushes an audit tag.
+#
+# The trigger deliberately watches describe.json, NOT Cargo.toml: gtdx publishes
+# at metadata.version, and a sibling repo once released fully green while putting
+# the *old* version in the store because only Cargo.toml had been bumped.
+# ci/check-version-sync.sh keeps the two from drifting apart.
+#
+# Manual workflow_dispatch with an explicit version is also supported.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to (re)publish, e.g. 0.2.2. Required.'
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  detect:
+    name: Detect version bump
+    runs-on: ubuntu-latest
+    outputs:
+      should_publish: ${{ steps.diff.outputs.should_publish }}
+      version: ${{ steps.diff.outputs.version }}
+      tag: ${{ steps.diff.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Diff describe.json metadata.version
+        id: diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          MANIFEST=provider-3aigent-gui/describe.json
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ inputs.version }}"
+            echo "==> manual dispatch for ${VERSION}"
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
+            echo "version=${VERSION}"  >> "$GITHUB_OUTPUT"
+            echo "tag=v${VERSION}"     >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          extract() {
+            git show "$1:${MANIFEST}" 2>/dev/null | jq -r '.metadata.version // empty' || echo ""
+          }
+
+          NEW=$(extract HEAD)
+          OLD=$(extract HEAD~1)
+          echo "  HEAD~1: ${OLD:-<none>}"
+          echo "  HEAD  : ${NEW:-<none>}"
+
+          if [ -z "$NEW" ]; then
+            echo "::warning::No metadata.version in HEAD ${MANIFEST} — skipping"
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "$NEW" = "$OLD" ]; then
+            echo "==> No version bump — skipping"
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          TAG="v${NEW}"
+          if git ls-remote --tags origin "refs/tags/${TAG}" | grep -q .; then
+            echo "::warning::Tag ${TAG} already exists — skipping"
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "==> Publishing ${NEW}"
+          echo "should_publish=true" >> "$GITHUB_OUTPUT"
+          echo "version=${NEW}"      >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}"          >> "$GITHUB_OUTPUT"
+
+  publish:
+    name: Publish to Greentic Store
+    needs: detect
+    if: needs.detect.outputs.should_publish == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Versions agree before publishing
+        run: bash ci/check-version-sync.sh
+
+      - name: Stage placeholder runtime gtpack + stamp its digest
+        working-directory: provider-3aigent-gui
+        run: |
+          set -euo pipefail
+          mkdir -p runtime
+          printf '3aigent-gui-runtime-placeholder-this-is-not-a-real-gtpack!\n' > runtime/provider.gtpack
+          SHA=$(sha256sum runtime/provider.gtpack | awk '{print $1}')
+          bash "$GITHUB_WORKSPACE/ci/stamp-gtpack-sha.sh" describe.json "$SHA"
+          echo "Staged placeholder runtime; sha256=$SHA"
+
+      - name: Pre-install wasm32-wasip2 on Rust 1.95
+        # cargo-component build inside `gtdx publish` honors rust-toolchain.toml;
+        # ensure the target exists regardless of the action's toolchain order.
+        run: rustup target add --toolchain 1.95 wasm32-wasip2
+
+      - uses: greenticai/greentic-designer-extension-action@v2
+        with:
+          store-url: https://store.greentic.cloud
+          store-token: ${{ secrets.GREENTIC_STORE_TOKEN }}
+          manifest: ./provider-3aigent-gui/Cargo.toml
+          version: ${{ needs.detect.outputs.version }}
+          gtdx-version: "1.2"
+
+  verify:
+    name: Verify the store, not the exit code
+    needs: [detect, publish]
+    if: needs.detect.outputs.should_publish == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: cargo-bins/cargo-binstall@main
+      - run: cargo binstall -y --version "^1.2" greentic-extension-sdk-cli
+
+      - name: Store lists the new version
+        # A green publish job is not proof. Today a run reported seven successful
+        # publishes while the store kept the previous version.
+        env:
+          GTDX_TOKEN: ${{ secrets.GREENTIC_STORE_TOKEN }}
+        run: |
+          set -euo pipefail
+          WANT="${{ needs.detect.outputs.version }}"
+          gtdx registries add greentic-store https://store.greentic.cloud 2>/dev/null || true
+          GOT=$(gtdx search greentic.provider.aigent-gui --registry greentic-store 2>&1 \
+                | awk '/greentic\.provider\.aigent-gui/ {print $2; exit}')
+          echo "  want: $WANT"
+          echo "  got : ${GOT:-<nothing>}"
+          [ "$GOT" = "$WANT" ] || {
+              echo "::error::store reports '${GOT:-nothing}', expected '${WANT}'"
+              exit 1
+          }
+          echo "✓ store shows ${WANT}"
+
+  tag:
+    name: Push audit tag
+    needs: [detect, publish, verify]
+    if: needs.detect.outputs.should_publish == 'true' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tag and push
+        run: |
+          set -euo pipefail
+          TAG="${{ needs.detect.outputs.tag }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${TAG}" -m "Release ${TAG}"
+          git push origin "${TAG}"
+          echo "✓ Tagged ${TAG}"

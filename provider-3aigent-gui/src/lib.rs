@@ -12,10 +12,8 @@ use bindings::greentic::extension_base::types;
 use bindings::greentic::extension_provider::types as provider_types;
 
 const CHANNEL_DIRECT_LINE: &str = "direct-line";
-const DIRECT_LINE_SECRET_SCHEMA: &str =
-    include_str!("../schemas/direct-line.secret.schema.json");
-const DIRECT_LINE_CONFIG_SCHEMA: &str =
-    include_str!("../schemas/direct-line.config.schema.json");
+const DIRECT_LINE_SECRET_SCHEMA: &str = include_str!("../schemas/direct-line.secret.schema.json");
+const DIRECT_LINE_CONFIG_SCHEMA: &str = include_str!("../schemas/direct-line.config.schema.json");
 
 struct Component;
 
@@ -91,7 +89,10 @@ fn direct_line_profile() -> provider_types::ChannelProfile {
         id: CHANNEL_DIRECT_LINE.into(),
         display_name: "Direct Line".into(),
         direction: provider_types::Direction::Bidirectional,
-        tier_support: vec![provider_types::CardTier::TierANative, provider_types::CardTier::TierDTextOnly],
+        tier_support: vec![
+            provider_types::CardTier::TierANative,
+            provider_types::CardTier::TierDTextOnly,
+        ],
         metadata: vec![],
     }
 }

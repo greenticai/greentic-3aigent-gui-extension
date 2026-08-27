@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@1.95.0
+        with:
+          components: rustfmt, clippy
+          targets: wasm32-wasip2
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            provider-3aigent-gui
+            provider-3aigent-gui-tests
+
+      - name: Install jq + zip + unzip
+        run: sudo apt-get update && sudo apt-get install -y jq zip unzip
+
+      - uses: cargo-bins/cargo-binstall@main
+
+      - name: Install cargo-component + wasm-tools + gtdx
+        # gtdx ships on crates.io as greentic-extension-sdk-cli. Pin the 1.2
+        # line: it is the first that reads describe.json v2, and 0.4 cannot.
+        run: |
+          cargo binstall -y cargo-component
+          cargo binstall -y wasm-tools
+          cargo binstall -y --version "^1.2" greentic-extension-sdk-cli
+          gtdx --version
+
+      - name: Vendored WIT matches pinned upstream
+        run: ./scripts/verify-wit-sync.sh
+
+      - name: describe.json / Cargo.toml / lib.rs versions agree
+        run: bash ci/check-version-sync.sh
+
+      - name: Build .gtxpack
+        # No real runtime pack in CI, so build.sh embeds its placeholder. That
+        # exercises packaging and staging; it is not a runnable extension.
+        working-directory: provider-3aigent-gui
+        run: ./build.sh
+
+      - name: Validate the built artifact
+        # Deliberately validates the unpacked .gtxpack, not the source
+        # describe.json: build.sh rewrites the manifest while staging, so the
+        # source says nothing about what actually ships.
+        run: |
+          set -euo pipefail
+          pack=$(ls provider-3aigent-gui/*.gtxpack)
+          echo "validating $pack"
+          rm -rf /tmp/xp && mkdir -p /tmp/xp
+          unzip -q "$pack" -d /tmp/xp
+          gtdx validate /tmp/xp
+
+      - name: Embedded runtime digest matches the manifest
+        run: |
+          set -euo pipefail
+          actual=$(sha256sum /tmp/xp/runtime/provider.gtpack | awk '{print $1}')
+          claimed=$(jq -r '.runtime.components."aigent-gui".gtpack.sha256' /tmp/xp/describe.json)
+          [ "$actual" = "$claimed" ] || {
+              echo "FAIL: manifest claims $claimed but the embedded pack is $actual"
+              exit 1
+          }
+          echo "OK: runtime digest matches ($actual)"
+
+      - name: Tests
+        working-directory: provider-3aigent-gui-tests
+        run: cargo test --locked
