@@ -122,6 +122,8 @@ pub mod greentic {
                 InvalidInput(_rt::String),
                 MissingCapability(_rt::String),
                 PermissionDenied(_rt::String),
+                NotFound(_rt::String),
+                SchemaInvalid(_rt::String),
                 Internal(_rt::String),
             }
             impl ::core::fmt::Debug for ExtensionError {
@@ -142,6 +144,14 @@ pub mod greentic {
                         }
                         ExtensionError::PermissionDenied(e) => {
                             f.debug_tuple("ExtensionError::PermissionDenied")
+                                .field(e)
+                                .finish()
+                        }
+                        ExtensionError::NotFound(e) => {
+                            f.debug_tuple("ExtensionError::NotFound").field(e).finish()
+                        }
+                        ExtensionError::SchemaInvalid(e) => {
+                            f.debug_tuple("ExtensionError::SchemaInvalid")
                                 .field(e)
                                 .finish()
                         }
@@ -635,39 +645,6 @@ pub mod greentic {
                         .finish()
                 }
             }
-            #[derive(Clone)]
-            pub enum Error {
-                NotFound(_rt::String),
-                SchemaInvalid(_rt::String),
-                Internal(_rt::String),
-            }
-            impl ::core::fmt::Debug for Error {
-                fn fmt(
-                    &self,
-                    f: &mut ::core::fmt::Formatter<'_>,
-                ) -> ::core::fmt::Result {
-                    match self {
-                        Error::NotFound(e) => {
-                            f.debug_tuple("Error::NotFound").field(e).finish()
-                        }
-                        Error::SchemaInvalid(e) => {
-                            f.debug_tuple("Error::SchemaInvalid").field(e).finish()
-                        }
-                        Error::Internal(e) => {
-                            f.debug_tuple("Error::Internal").field(e).finish()
-                        }
-                    }
-                }
-            }
-            impl ::core::fmt::Display for Error {
-                fn fmt(
-                    &self,
-                    f: &mut ::core::fmt::Formatter<'_>,
-                ) -> ::core::fmt::Result {
-                    write!(f, "{:?}", self)
-                }
-            }
-            impl std::error::Error for Error {}
         }
     }
 }
@@ -907,37 +884,37 @@ pub mod exports {
                     fn get_required() -> _rt::Vec<CapabilityRef>;
                 }
                 #[doc(hidden)]
-                macro_rules! __export_greentic_extension_base_manifest_0_1_0_cabi {
+                macro_rules! __export_greentic_extension_base_manifest_0_2_0_cabi {
                     ($ty:ident with_types_in $($path_to_types:tt)*) => {
                         const _ : () = { #[unsafe (export_name =
-                        "greentic:extension-base/manifest@0.1.0#get-identity")] unsafe
+                        "greentic:extension-base/manifest@0.2.0#get-identity")] unsafe
                         extern "C" fn export_get_identity() -> * mut u8 { unsafe {
                         $($path_to_types)*:: _export_get_identity_cabi::<$ty > () } }
                         #[unsafe (export_name =
-                        "cabi_post_greentic:extension-base/manifest@0.1.0#get-identity")]
+                        "cabi_post_greentic:extension-base/manifest@0.2.0#get-identity")]
                         unsafe extern "C" fn _post_return_get_identity(arg0 : * mut u8,)
                         { unsafe { $($path_to_types)*:: __post_return_get_identity::<$ty
                         > (arg0) } } #[unsafe (export_name =
-                        "greentic:extension-base/manifest@0.1.0#get-offered")] unsafe
+                        "greentic:extension-base/manifest@0.2.0#get-offered")] unsafe
                         extern "C" fn export_get_offered() -> * mut u8 { unsafe {
                         $($path_to_types)*:: _export_get_offered_cabi::<$ty > () } }
                         #[unsafe (export_name =
-                        "cabi_post_greentic:extension-base/manifest@0.1.0#get-offered")]
+                        "cabi_post_greentic:extension-base/manifest@0.2.0#get-offered")]
                         unsafe extern "C" fn _post_return_get_offered(arg0 : * mut u8,) {
                         unsafe { $($path_to_types)*:: __post_return_get_offered::<$ty >
                         (arg0) } } #[unsafe (export_name =
-                        "greentic:extension-base/manifest@0.1.0#get-required")] unsafe
+                        "greentic:extension-base/manifest@0.2.0#get-required")] unsafe
                         extern "C" fn export_get_required() -> * mut u8 { unsafe {
                         $($path_to_types)*:: _export_get_required_cabi::<$ty > () } }
                         #[unsafe (export_name =
-                        "cabi_post_greentic:extension-base/manifest@0.1.0#get-required")]
+                        "cabi_post_greentic:extension-base/manifest@0.2.0#get-required")]
                         unsafe extern "C" fn _post_return_get_required(arg0 : * mut u8,)
                         { unsafe { $($path_to_types)*:: __post_return_get_required::<$ty
                         > (arg0) } } };
                     };
                 }
                 #[doc(hidden)]
-                pub(crate) use __export_greentic_extension_base_manifest_0_1_0_cabi;
+                pub(crate) use __export_greentic_extension_base_manifest_0_2_0_cabi;
                 #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
                 #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
                 struct _RetArea(
@@ -974,9 +951,9 @@ pub mod exports {
                         }
                         Err(e) => {
                             *ptr2.add(0).cast::<u8>() = (1i32) as u8;
-                            use super::super::super::super::greentic::extension_base::types::ExtensionError as V7;
+                            use super::super::super::super::greentic::extension_base::types::ExtensionError as V9;
                             match e {
-                                V7::InvalidInput(e) => {
+                                V9::InvalidInput(e) => {
                                     *ptr2
                                         .add(::core::mem::size_of::<*const u8>())
                                         .cast::<u8>() = (0i32) as u8;
@@ -991,7 +968,7 @@ pub mod exports {
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>() = ptr3.cast_mut();
                                 }
-                                V7::MissingCapability(e) => {
+                                V9::MissingCapability(e) => {
                                     *ptr2
                                         .add(::core::mem::size_of::<*const u8>())
                                         .cast::<u8>() = (1i32) as u8;
@@ -1006,7 +983,7 @@ pub mod exports {
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>() = ptr4.cast_mut();
                                 }
-                                V7::PermissionDenied(e) => {
+                                V9::PermissionDenied(e) => {
                                     *ptr2
                                         .add(::core::mem::size_of::<*const u8>())
                                         .cast::<u8>() = (2i32) as u8;
@@ -1021,7 +998,7 @@ pub mod exports {
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>() = ptr5.cast_mut();
                                 }
-                                V7::Internal(e) => {
+                                V9::NotFound(e) => {
                                     *ptr2
                                         .add(::core::mem::size_of::<*const u8>())
                                         .cast::<u8>() = (3i32) as u8;
@@ -1035,6 +1012,36 @@ pub mod exports {
                                     *ptr2
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>() = ptr6.cast_mut();
+                                }
+                                V9::SchemaInvalid(e) => {
+                                    *ptr2
+                                        .add(::core::mem::size_of::<*const u8>())
+                                        .cast::<u8>() = (4i32) as u8;
+                                    let vec7 = (e.into_bytes()).into_boxed_slice();
+                                    let ptr7 = vec7.as_ptr().cast::<u8>();
+                                    let len7 = vec7.len();
+                                    ::core::mem::forget(vec7);
+                                    *ptr2
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>() = len7;
+                                    *ptr2
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>() = ptr7.cast_mut();
+                                }
+                                V9::Internal(e) => {
+                                    *ptr2
+                                        .add(::core::mem::size_of::<*const u8>())
+                                        .cast::<u8>() = (5i32) as u8;
+                                    let vec8 = (e.into_bytes()).into_boxed_slice();
+                                    let ptr8 = vec8.as_ptr().cast::<u8>();
+                                    let len8 = vec8.len();
+                                    ::core::mem::forget(vec8);
+                                    *ptr2
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>() = len8;
+                                    *ptr2
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>() = ptr8.cast_mut();
                                 }
                             }
                         }
@@ -1079,7 +1086,7 @@ pub mod exports {
                                         .cast::<usize>();
                                     _rt::cabi_dealloc(l6, l7, 1);
                                 }
-                                _ => {
+                                3 => {
                                     let l8 = *arg0
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>();
@@ -1087,6 +1094,24 @@ pub mod exports {
                                         .add(3 * ::core::mem::size_of::<*const u8>())
                                         .cast::<usize>();
                                     _rt::cabi_dealloc(l8, l9, 1);
+                                }
+                                4 => {
+                                    let l10 = *arg0
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>();
+                                    let l11 = *arg0
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>();
+                                    _rt::cabi_dealloc(l10, l11, 1);
+                                }
+                                _ => {
+                                    let l12 = *arg0
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>();
+                                    let l13 = *arg0
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>();
+                                    _rt::cabi_dealloc(l12, l13, 1);
                                 }
                             }
                         }
@@ -1103,24 +1128,24 @@ pub mod exports {
                     fn shutdown() -> ();
                 }
                 #[doc(hidden)]
-                macro_rules! __export_greentic_extension_base_lifecycle_0_1_0_cabi {
+                macro_rules! __export_greentic_extension_base_lifecycle_0_2_0_cabi {
                     ($ty:ident with_types_in $($path_to_types:tt)*) => {
                         const _ : () = { #[unsafe (export_name =
-                        "greentic:extension-base/lifecycle@0.1.0#init")] unsafe extern
+                        "greentic:extension-base/lifecycle@0.2.0#init")] unsafe extern
                         "C" fn export_init(arg0 : * mut u8, arg1 : usize,) -> * mut u8 {
                         unsafe { $($path_to_types)*:: _export_init_cabi::<$ty > (arg0,
                         arg1) } } #[unsafe (export_name =
-                        "cabi_post_greentic:extension-base/lifecycle@0.1.0#init")] unsafe
+                        "cabi_post_greentic:extension-base/lifecycle@0.2.0#init")] unsafe
                         extern "C" fn _post_return_init(arg0 : * mut u8,) { unsafe {
                         $($path_to_types)*:: __post_return_init::<$ty > (arg0) } }
                         #[unsafe (export_name =
-                        "greentic:extension-base/lifecycle@0.1.0#shutdown")] unsafe
+                        "greentic:extension-base/lifecycle@0.2.0#shutdown")] unsafe
                         extern "C" fn export_shutdown() { unsafe { $($path_to_types)*::
                         _export_shutdown_cabi::<$ty > () } } };
                     };
                 }
                 #[doc(hidden)]
-                pub(crate) use __export_greentic_extension_base_lifecycle_0_1_0_cabi;
+                pub(crate) use __export_greentic_extension_base_lifecycle_0_2_0_cabi;
                 #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
                 #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
                 struct _RetArea(
@@ -1141,9 +1166,9 @@ pub mod exports {
                 #[doc(hidden)]
                 static __FORCE_SECTION_REF: fn() = super::super::super::super::__link_custom_section_describing_imports;
                 use super::super::super::super::_rt;
+                pub type ExtensionError = super::super::super::super::greentic::extension_base::types::ExtensionError;
                 pub type ChannelId = super::super::super::super::greentic::extension_provider::types::ChannelId;
                 pub type ChannelProfile = super::super::super::super::greentic::extension_provider::types::ChannelProfile;
-                pub type Error = super::super::super::super::greentic::extension_provider::types::Error;
                 #[doc(hidden)]
                 #[allow(non_snake_case)]
                 pub unsafe fn _export_list_channels_cabi<T: Guest>() -> *mut u8 {
@@ -1469,9 +1494,9 @@ pub mod exports {
                         }
                         Err(e) => {
                             *ptr2.add(0).cast::<u8>() = (1i32) as u8;
-                            use super::super::super::super::greentic::extension_provider::types::Error as V14;
+                            use super::super::super::super::greentic::extension_base::types::ExtensionError as V17;
                             match e {
-                                V14::NotFound(e) => {
+                                V17::InvalidInput(e) => {
                                     *ptr2
                                         .add(::core::mem::size_of::<*const u8>())
                                         .cast::<u8>() = (0i32) as u8;
@@ -1486,7 +1511,7 @@ pub mod exports {
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>() = ptr11.cast_mut();
                                 }
-                                V14::SchemaInvalid(e) => {
+                                V17::MissingCapability(e) => {
                                     *ptr2
                                         .add(::core::mem::size_of::<*const u8>())
                                         .cast::<u8>() = (1i32) as u8;
@@ -1501,7 +1526,7 @@ pub mod exports {
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>() = ptr12.cast_mut();
                                 }
-                                V14::Internal(e) => {
+                                V17::PermissionDenied(e) => {
                                     *ptr2
                                         .add(::core::mem::size_of::<*const u8>())
                                         .cast::<u8>() = (2i32) as u8;
@@ -1515,6 +1540,51 @@ pub mod exports {
                                     *ptr2
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>() = ptr13.cast_mut();
+                                }
+                                V17::NotFound(e) => {
+                                    *ptr2
+                                        .add(::core::mem::size_of::<*const u8>())
+                                        .cast::<u8>() = (3i32) as u8;
+                                    let vec14 = (e.into_bytes()).into_boxed_slice();
+                                    let ptr14 = vec14.as_ptr().cast::<u8>();
+                                    let len14 = vec14.len();
+                                    ::core::mem::forget(vec14);
+                                    *ptr2
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>() = len14;
+                                    *ptr2
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>() = ptr14.cast_mut();
+                                }
+                                V17::SchemaInvalid(e) => {
+                                    *ptr2
+                                        .add(::core::mem::size_of::<*const u8>())
+                                        .cast::<u8>() = (4i32) as u8;
+                                    let vec15 = (e.into_bytes()).into_boxed_slice();
+                                    let ptr15 = vec15.as_ptr().cast::<u8>();
+                                    let len15 = vec15.len();
+                                    ::core::mem::forget(vec15);
+                                    *ptr2
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>() = len15;
+                                    *ptr2
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>() = ptr15.cast_mut();
+                                }
+                                V17::Internal(e) => {
+                                    *ptr2
+                                        .add(::core::mem::size_of::<*const u8>())
+                                        .cast::<u8>() = (5i32) as u8;
+                                    let vec16 = (e.into_bytes()).into_boxed_slice();
+                                    let ptr16 = vec16.as_ptr().cast::<u8>();
+                                    let len16 = vec16.len();
+                                    ::core::mem::forget(vec16);
+                                    *ptr2
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>() = len16;
+                                    *ptr2
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>() = ptr16.cast_mut();
                                 }
                             }
                         }
@@ -1605,7 +1675,7 @@ pub mod exports {
                                         .cast::<usize>();
                                     _rt::cabi_dealloc(l18, l19, 1);
                                 }
-                                _ => {
+                                2 => {
                                     let l20 = *arg0
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>();
@@ -1613,6 +1683,33 @@ pub mod exports {
                                         .add(3 * ::core::mem::size_of::<*const u8>())
                                         .cast::<usize>();
                                     _rt::cabi_dealloc(l20, l21, 1);
+                                }
+                                3 => {
+                                    let l22 = *arg0
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>();
+                                    let l23 = *arg0
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>();
+                                    _rt::cabi_dealloc(l22, l23, 1);
+                                }
+                                4 => {
+                                    let l24 = *arg0
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>();
+                                    let l25 = *arg0
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>();
+                                    _rt::cabi_dealloc(l24, l25, 1);
+                                }
+                                _ => {
+                                    let l26 = *arg0
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>();
+                                    let l27 = *arg0
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>();
+                                    _rt::cabi_dealloc(l26, l27, 1);
                                 }
                             }
                         }
@@ -1645,9 +1742,9 @@ pub mod exports {
                         }
                         Err(e) => {
                             *ptr2.add(0).cast::<u8>() = (1i32) as u8;
-                            use super::super::super::super::greentic::extension_provider::types::Error as V7;
+                            use super::super::super::super::greentic::extension_base::types::ExtensionError as V10;
                             match e {
-                                V7::NotFound(e) => {
+                                V10::InvalidInput(e) => {
                                     *ptr2
                                         .add(::core::mem::size_of::<*const u8>())
                                         .cast::<u8>() = (0i32) as u8;
@@ -1662,7 +1759,7 @@ pub mod exports {
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>() = ptr4.cast_mut();
                                 }
-                                V7::SchemaInvalid(e) => {
+                                V10::MissingCapability(e) => {
                                     *ptr2
                                         .add(::core::mem::size_of::<*const u8>())
                                         .cast::<u8>() = (1i32) as u8;
@@ -1677,7 +1774,7 @@ pub mod exports {
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>() = ptr5.cast_mut();
                                 }
-                                V7::Internal(e) => {
+                                V10::PermissionDenied(e) => {
                                     *ptr2
                                         .add(::core::mem::size_of::<*const u8>())
                                         .cast::<u8>() = (2i32) as u8;
@@ -1691,6 +1788,51 @@ pub mod exports {
                                     *ptr2
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>() = ptr6.cast_mut();
+                                }
+                                V10::NotFound(e) => {
+                                    *ptr2
+                                        .add(::core::mem::size_of::<*const u8>())
+                                        .cast::<u8>() = (3i32) as u8;
+                                    let vec7 = (e.into_bytes()).into_boxed_slice();
+                                    let ptr7 = vec7.as_ptr().cast::<u8>();
+                                    let len7 = vec7.len();
+                                    ::core::mem::forget(vec7);
+                                    *ptr2
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>() = len7;
+                                    *ptr2
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>() = ptr7.cast_mut();
+                                }
+                                V10::SchemaInvalid(e) => {
+                                    *ptr2
+                                        .add(::core::mem::size_of::<*const u8>())
+                                        .cast::<u8>() = (4i32) as u8;
+                                    let vec8 = (e.into_bytes()).into_boxed_slice();
+                                    let ptr8 = vec8.as_ptr().cast::<u8>();
+                                    let len8 = vec8.len();
+                                    ::core::mem::forget(vec8);
+                                    *ptr2
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>() = len8;
+                                    *ptr2
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>() = ptr8.cast_mut();
+                                }
+                                V10::Internal(e) => {
+                                    *ptr2
+                                        .add(::core::mem::size_of::<*const u8>())
+                                        .cast::<u8>() = (5i32) as u8;
+                                    let vec9 = (e.into_bytes()).into_boxed_slice();
+                                    let ptr9 = vec9.as_ptr().cast::<u8>();
+                                    let len9 = vec9.len();
+                                    ::core::mem::forget(vec9);
+                                    *ptr2
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>() = len9;
+                                    *ptr2
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>() = ptr9.cast_mut();
                                 }
                             }
                         }
@@ -1734,7 +1876,7 @@ pub mod exports {
                                         .cast::<usize>();
                                     _rt::cabi_dealloc(l6, l7, 1);
                                 }
-                                _ => {
+                                2 => {
                                     let l8 = *arg0
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>();
@@ -1742,6 +1884,33 @@ pub mod exports {
                                         .add(3 * ::core::mem::size_of::<*const u8>())
                                         .cast::<usize>();
                                     _rt::cabi_dealloc(l8, l9, 1);
+                                }
+                                3 => {
+                                    let l10 = *arg0
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>();
+                                    let l11 = *arg0
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>();
+                                    _rt::cabi_dealloc(l10, l11, 1);
+                                }
+                                4 => {
+                                    let l12 = *arg0
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>();
+                                    let l13 = *arg0
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>();
+                                    _rt::cabi_dealloc(l12, l13, 1);
+                                }
+                                _ => {
+                                    let l14 = *arg0
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>();
+                                    let l15 = *arg0
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>();
+                                    _rt::cabi_dealloc(l14, l15, 1);
                                 }
                             }
                         }
@@ -1774,9 +1943,9 @@ pub mod exports {
                         }
                         Err(e) => {
                             *ptr2.add(0).cast::<u8>() = (1i32) as u8;
-                            use super::super::super::super::greentic::extension_provider::types::Error as V7;
+                            use super::super::super::super::greentic::extension_base::types::ExtensionError as V10;
                             match e {
-                                V7::NotFound(e) => {
+                                V10::InvalidInput(e) => {
                                     *ptr2
                                         .add(::core::mem::size_of::<*const u8>())
                                         .cast::<u8>() = (0i32) as u8;
@@ -1791,7 +1960,7 @@ pub mod exports {
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>() = ptr4.cast_mut();
                                 }
-                                V7::SchemaInvalid(e) => {
+                                V10::MissingCapability(e) => {
                                     *ptr2
                                         .add(::core::mem::size_of::<*const u8>())
                                         .cast::<u8>() = (1i32) as u8;
@@ -1806,7 +1975,7 @@ pub mod exports {
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>() = ptr5.cast_mut();
                                 }
-                                V7::Internal(e) => {
+                                V10::PermissionDenied(e) => {
                                     *ptr2
                                         .add(::core::mem::size_of::<*const u8>())
                                         .cast::<u8>() = (2i32) as u8;
@@ -1820,6 +1989,51 @@ pub mod exports {
                                     *ptr2
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>() = ptr6.cast_mut();
+                                }
+                                V10::NotFound(e) => {
+                                    *ptr2
+                                        .add(::core::mem::size_of::<*const u8>())
+                                        .cast::<u8>() = (3i32) as u8;
+                                    let vec7 = (e.into_bytes()).into_boxed_slice();
+                                    let ptr7 = vec7.as_ptr().cast::<u8>();
+                                    let len7 = vec7.len();
+                                    ::core::mem::forget(vec7);
+                                    *ptr2
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>() = len7;
+                                    *ptr2
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>() = ptr7.cast_mut();
+                                }
+                                V10::SchemaInvalid(e) => {
+                                    *ptr2
+                                        .add(::core::mem::size_of::<*const u8>())
+                                        .cast::<u8>() = (4i32) as u8;
+                                    let vec8 = (e.into_bytes()).into_boxed_slice();
+                                    let ptr8 = vec8.as_ptr().cast::<u8>();
+                                    let len8 = vec8.len();
+                                    ::core::mem::forget(vec8);
+                                    *ptr2
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>() = len8;
+                                    *ptr2
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>() = ptr8.cast_mut();
+                                }
+                                V10::Internal(e) => {
+                                    *ptr2
+                                        .add(::core::mem::size_of::<*const u8>())
+                                        .cast::<u8>() = (5i32) as u8;
+                                    let vec9 = (e.into_bytes()).into_boxed_slice();
+                                    let ptr9 = vec9.as_ptr().cast::<u8>();
+                                    let len9 = vec9.len();
+                                    ::core::mem::forget(vec9);
+                                    *ptr2
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>() = len9;
+                                    *ptr2
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>() = ptr9.cast_mut();
                                 }
                             }
                         }
@@ -1863,7 +2077,7 @@ pub mod exports {
                                         .cast::<usize>();
                                     _rt::cabi_dealloc(l6, l7, 1);
                                 }
-                                _ => {
+                                2 => {
                                     let l8 = *arg0
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>();
@@ -1871,6 +2085,33 @@ pub mod exports {
                                         .add(3 * ::core::mem::size_of::<*const u8>())
                                         .cast::<usize>();
                                     _rt::cabi_dealloc(l8, l9, 1);
+                                }
+                                3 => {
+                                    let l10 = *arg0
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>();
+                                    let l11 = *arg0
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>();
+                                    _rt::cabi_dealloc(l10, l11, 1);
+                                }
+                                4 => {
+                                    let l12 = *arg0
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>();
+                                    let l13 = *arg0
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>();
+                                    _rt::cabi_dealloc(l12, l13, 1);
+                                }
+                                _ => {
+                                    let l14 = *arg0
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>();
+                                    let l15 = *arg0
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>();
+                                    _rt::cabi_dealloc(l14, l15, 1);
                                 }
                             }
                         }
@@ -1909,9 +2150,9 @@ pub mod exports {
                         }
                         Err(e) => {
                             *ptr3.add(0).cast::<u8>() = (1i32) as u8;
-                            use super::super::super::super::greentic::extension_provider::types::Error as V8;
+                            use super::super::super::super::greentic::extension_base::types::ExtensionError as V11;
                             match e {
-                                V8::NotFound(e) => {
+                                V11::InvalidInput(e) => {
                                     *ptr3
                                         .add(::core::mem::size_of::<*const u8>())
                                         .cast::<u8>() = (0i32) as u8;
@@ -1926,7 +2167,7 @@ pub mod exports {
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>() = ptr5.cast_mut();
                                 }
-                                V8::SchemaInvalid(e) => {
+                                V11::MissingCapability(e) => {
                                     *ptr3
                                         .add(::core::mem::size_of::<*const u8>())
                                         .cast::<u8>() = (1i32) as u8;
@@ -1941,7 +2182,7 @@ pub mod exports {
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>() = ptr6.cast_mut();
                                 }
-                                V8::Internal(e) => {
+                                V11::PermissionDenied(e) => {
                                     *ptr3
                                         .add(::core::mem::size_of::<*const u8>())
                                         .cast::<u8>() = (2i32) as u8;
@@ -1955,6 +2196,51 @@ pub mod exports {
                                     *ptr3
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>() = ptr7.cast_mut();
+                                }
+                                V11::NotFound(e) => {
+                                    *ptr3
+                                        .add(::core::mem::size_of::<*const u8>())
+                                        .cast::<u8>() = (3i32) as u8;
+                                    let vec8 = (e.into_bytes()).into_boxed_slice();
+                                    let ptr8 = vec8.as_ptr().cast::<u8>();
+                                    let len8 = vec8.len();
+                                    ::core::mem::forget(vec8);
+                                    *ptr3
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>() = len8;
+                                    *ptr3
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>() = ptr8.cast_mut();
+                                }
+                                V11::SchemaInvalid(e) => {
+                                    *ptr3
+                                        .add(::core::mem::size_of::<*const u8>())
+                                        .cast::<u8>() = (4i32) as u8;
+                                    let vec9 = (e.into_bytes()).into_boxed_slice();
+                                    let ptr9 = vec9.as_ptr().cast::<u8>();
+                                    let len9 = vec9.len();
+                                    ::core::mem::forget(vec9);
+                                    *ptr3
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>() = len9;
+                                    *ptr3
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>() = ptr9.cast_mut();
+                                }
+                                V11::Internal(e) => {
+                                    *ptr3
+                                        .add(::core::mem::size_of::<*const u8>())
+                                        .cast::<u8>() = (5i32) as u8;
+                                    let vec10 = (e.into_bytes()).into_boxed_slice();
+                                    let ptr10 = vec10.as_ptr().cast::<u8>();
+                                    let len10 = vec10.len();
+                                    ::core::mem::forget(vec10);
+                                    *ptr3
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>() = len10;
+                                    *ptr3
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>() = ptr10.cast_mut();
                                 }
                             }
                         }
@@ -2000,7 +2286,7 @@ pub mod exports {
                                         .cast::<usize>();
                                     _rt::cabi_dealloc(l7, l8, 1);
                                 }
-                                _ => {
+                                2 => {
                                     let l9 = *arg0
                                         .add(2 * ::core::mem::size_of::<*const u8>())
                                         .cast::<*mut u8>();
@@ -2009,73 +2295,106 @@ pub mod exports {
                                         .cast::<usize>();
                                     _rt::cabi_dealloc(l9, l10, 1);
                                 }
+                                3 => {
+                                    let l11 = *arg0
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>();
+                                    let l12 = *arg0
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>();
+                                    _rt::cabi_dealloc(l11, l12, 1);
+                                }
+                                4 => {
+                                    let l13 = *arg0
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>();
+                                    let l14 = *arg0
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>();
+                                    _rt::cabi_dealloc(l13, l14, 1);
+                                }
+                                _ => {
+                                    let l15 = *arg0
+                                        .add(2 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<*mut u8>();
+                                    let l16 = *arg0
+                                        .add(3 * ::core::mem::size_of::<*const u8>())
+                                        .cast::<usize>();
+                                    _rt::cabi_dealloc(l15, l16, 1);
+                                }
                             }
                         }
                     }
                 }
                 pub trait Guest {
                     fn list_channels() -> _rt::Vec<ChannelProfile>;
-                    fn describe_channel(id: ChannelId) -> Result<ChannelProfile, Error>;
-                    fn secret_schema(id: ChannelId) -> Result<_rt::String, Error>;
-                    fn config_schema(id: ChannelId) -> Result<_rt::String, Error>;
+                    fn describe_channel(
+                        id: ChannelId,
+                    ) -> Result<ChannelProfile, ExtensionError>;
+                    fn secret_schema(
+                        id: ChannelId,
+                    ) -> Result<_rt::String, ExtensionError>;
+                    fn config_schema(
+                        id: ChannelId,
+                    ) -> Result<_rt::String, ExtensionError>;
                     fn dry_run_encode(
                         id: ChannelId,
                         sample: _rt::Vec<u8>,
-                    ) -> Result<_rt::Vec<u8>, Error>;
+                    ) -> Result<_rt::Vec<u8>, ExtensionError>;
                 }
                 #[doc(hidden)]
-                macro_rules! __export_greentic_extension_provider_messaging_0_1_0_cabi {
+                macro_rules! __export_greentic_extension_provider_messaging_0_2_0_cabi {
                     ($ty:ident with_types_in $($path_to_types:tt)*) => {
                         const _ : () = { #[unsafe (export_name =
-                        "greentic:extension-provider/messaging@0.1.0#list-channels")]
+                        "greentic:extension-provider/messaging@0.2.0#list-channels")]
                         unsafe extern "C" fn export_list_channels() -> * mut u8 { unsafe
                         { $($path_to_types)*:: _export_list_channels_cabi::<$ty > () } }
                         #[unsafe (export_name =
-                        "cabi_post_greentic:extension-provider/messaging@0.1.0#list-channels")]
+                        "cabi_post_greentic:extension-provider/messaging@0.2.0#list-channels")]
                         unsafe extern "C" fn _post_return_list_channels(arg0 : * mut u8,)
                         { unsafe { $($path_to_types)*:: __post_return_list_channels::<$ty
                         > (arg0) } } #[unsafe (export_name =
-                        "greentic:extension-provider/messaging@0.1.0#describe-channel")]
+                        "greentic:extension-provider/messaging@0.2.0#describe-channel")]
                         unsafe extern "C" fn export_describe_channel(arg0 : * mut u8,
                         arg1 : usize,) -> * mut u8 { unsafe { $($path_to_types)*::
                         _export_describe_channel_cabi::<$ty > (arg0, arg1) } } #[unsafe
                         (export_name =
-                        "cabi_post_greentic:extension-provider/messaging@0.1.0#describe-channel")]
+                        "cabi_post_greentic:extension-provider/messaging@0.2.0#describe-channel")]
                         unsafe extern "C" fn _post_return_describe_channel(arg0 : * mut
                         u8,) { unsafe { $($path_to_types)*::
                         __post_return_describe_channel::<$ty > (arg0) } } #[unsafe
                         (export_name =
-                        "greentic:extension-provider/messaging@0.1.0#secret-schema")]
+                        "greentic:extension-provider/messaging@0.2.0#secret-schema")]
                         unsafe extern "C" fn export_secret_schema(arg0 : * mut u8, arg1 :
                         usize,) -> * mut u8 { unsafe { $($path_to_types)*::
                         _export_secret_schema_cabi::<$ty > (arg0, arg1) } } #[unsafe
                         (export_name =
-                        "cabi_post_greentic:extension-provider/messaging@0.1.0#secret-schema")]
+                        "cabi_post_greentic:extension-provider/messaging@0.2.0#secret-schema")]
                         unsafe extern "C" fn _post_return_secret_schema(arg0 : * mut u8,)
                         { unsafe { $($path_to_types)*:: __post_return_secret_schema::<$ty
                         > (arg0) } } #[unsafe (export_name =
-                        "greentic:extension-provider/messaging@0.1.0#config-schema")]
+                        "greentic:extension-provider/messaging@0.2.0#config-schema")]
                         unsafe extern "C" fn export_config_schema(arg0 : * mut u8, arg1 :
                         usize,) -> * mut u8 { unsafe { $($path_to_types)*::
                         _export_config_schema_cabi::<$ty > (arg0, arg1) } } #[unsafe
                         (export_name =
-                        "cabi_post_greentic:extension-provider/messaging@0.1.0#config-schema")]
+                        "cabi_post_greentic:extension-provider/messaging@0.2.0#config-schema")]
                         unsafe extern "C" fn _post_return_config_schema(arg0 : * mut u8,)
                         { unsafe { $($path_to_types)*:: __post_return_config_schema::<$ty
                         > (arg0) } } #[unsafe (export_name =
-                        "greentic:extension-provider/messaging@0.1.0#dry-run-encode")]
+                        "greentic:extension-provider/messaging@0.2.0#dry-run-encode")]
                         unsafe extern "C" fn export_dry_run_encode(arg0 : * mut u8, arg1
                         : usize, arg2 : * mut u8, arg3 : usize,) -> * mut u8 { unsafe {
                         $($path_to_types)*:: _export_dry_run_encode_cabi::<$ty > (arg0,
                         arg1, arg2, arg3) } } #[unsafe (export_name =
-                        "cabi_post_greentic:extension-provider/messaging@0.1.0#dry-run-encode")]
+                        "cabi_post_greentic:extension-provider/messaging@0.2.0#dry-run-encode")]
                         unsafe extern "C" fn _post_return_dry_run_encode(arg0 : * mut
                         u8,) { unsafe { $($path_to_types)*::
                         __post_return_dry_run_encode::<$ty > (arg0) } } };
                     };
                 }
                 #[doc(hidden)]
-                pub(crate) use __export_greentic_extension_provider_messaging_0_1_0_cabi;
+                pub(crate) use __export_greentic_extension_provider_messaging_0_2_0_cabi;
                 #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
                 #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
                 struct _RetArea(
@@ -2135,74 +2454,73 @@ mod _rt {
 /// ```
 #[allow(unused_macros)]
 #[doc(hidden)]
-macro_rules! __export_provider_extension_impl {
+macro_rules! __export_extension_impl {
     ($ty:ident) => {
         self::export!($ty with_types_in self);
     };
     ($ty:ident with_types_in $($path_to_types_root:tt)*) => {
         $($path_to_types_root)*::
-        exports::greentic::extension_base::manifest::__export_greentic_extension_base_manifest_0_1_0_cabi!($ty
+        exports::greentic::extension_base::manifest::__export_greentic_extension_base_manifest_0_2_0_cabi!($ty
         with_types_in $($path_to_types_root)*::
         exports::greentic::extension_base::manifest); $($path_to_types_root)*::
-        exports::greentic::extension_base::lifecycle::__export_greentic_extension_base_lifecycle_0_1_0_cabi!($ty
+        exports::greentic::extension_base::lifecycle::__export_greentic_extension_base_lifecycle_0_2_0_cabi!($ty
         with_types_in $($path_to_types_root)*::
         exports::greentic::extension_base::lifecycle); $($path_to_types_root)*::
-        exports::greentic::extension_provider::messaging::__export_greentic_extension_provider_messaging_0_1_0_cabi!($ty
+        exports::greentic::extension_provider::messaging::__export_greentic_extension_provider_messaging_0_2_0_cabi!($ty
         with_types_in $($path_to_types_root)*::
         exports::greentic::extension_provider::messaging);
     };
 }
 #[doc(inline)]
-pub(crate) use __export_provider_extension_impl as export;
+pub(crate) use __export_extension_impl as export;
 #[cfg(target_arch = "wasm32")]
 #[unsafe(
-    link_section = "component-type:wit-bindgen:0.41.0:greentic:provider-aigent-gui-extension:provider-extension:encoded world"
+    link_section = "component-type:wit-bindgen:0.41.0:greentic:provider-aigent-gui-extension:extension:encoded world"
 )]
 #[doc(hidden)]
 #[allow(clippy::octal_escapes)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 1982] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xb5\x0e\x01A\x02\x01\
-A\x14\x01B\x0d\x01m\x04\x06design\x06bundle\x06deploy\x08provider\x04\0\x04kind\x03\
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 1938] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\x92\x0e\x01A\x02\x01\
+A\x13\x01B\x0d\x01m\x04\x06design\x06bundle\x06deploy\x08provider\x04\0\x04kind\x03\
 \0\0\x01r\x03\x02ids\x07versions\x04kind\x01\x04\0\x12extension-identity\x03\0\x02\
 \x01r\x02\x02ids\x07versions\x04\0\x0ecapability-ref\x03\0\x04\x01m\x04\x05error\
 \x07warning\x04info\x04hint\x04\0\x08severity\x03\0\x06\x01ks\x01r\x04\x08severi\
-ty\x07\x04codes\x07messages\x04path\x08\x04\0\x0adiagnostic\x03\0\x09\x01q\x04\x0d\
-invalid-input\x01s\0\x12missing-capability\x01s\0\x11permission-denied\x01s\0\x08\
-internal\x01s\0\x04\0\x0fextension-error\x03\0\x0b\x03\0#greentic:extension-base\
-/types@0.1.0\x05\0\x01B\x08\x01m\x05\x05trace\x05debug\x04info\x04warn\x05error\x04\
-\0\x05level\x03\0\0\x01@\x03\x05level\x01\x06targets\x07messages\x01\0\x04\0\x03\
-log\x01\x02\x01o\x02ss\x01p\x03\x01@\x04\x05level\x01\x06targets\x07messages\x06\
-fields\x04\x01\0\x04\0\x06log-kv\x01\x05\x03\0%greentic:extension-host/logging@0\
-.1.0\x05\x01\x01B\x06\x01@\x01\x03keys\0s\x04\0\x01t\x01\0\x01o\x02ss\x01p\x01\x01\
-@\x02\x03keys\x04args\x02\0s\x04\0\x02tf\x01\x03\x03\0\"greentic:extension-host/\
-i18n@0.1.0\x05\x02\x01B\x15\x01s\x04\0\x0achannel-id\x03\0\0\x01s\x04\0\x0atrigg\
-er-id\x03\0\x02\x01s\x04\0\x08event-id\x03\0\x04\x01m\x03\x07inbound\x08outbound\
-\x0dbidirectional\x04\0\x09direction\x03\0\x06\x01m\x04\x0dtier-a-native\x11tier\
--b-attachment\x0ftier-c-fallback\x10tier-d-text-only\x04\0\x09card-tier\x03\0\x08\
-\x01p\x09\x01o\x02ss\x01p\x0b\x01r\x05\x02id\x01\x0cdisplay-names\x09direction\x07\
-\x0ctier-support\x0a\x08metadata\x0c\x04\0\x0fchannel-profile\x03\0\x0d\x01r\x03\
-\x02id\x03\x0cdisplay-names\x0aemit-shapes\x04\0\x0ftrigger-profile\x03\0\x0f\x01\
-r\x03\x02id\x05\x0cdisplay-names\x0dpayload-shapes\x04\0\x0devent-profile\x03\0\x11\
-\x01q\x03\x09not-found\x01s\0\x0eschema-invalid\x01s\0\x08internal\x01s\0\x04\0\x05\
-error\x03\0\x13\x03\0'greentic:extension-provider/types@0.1.0\x05\x03\x02\x03\0\0\
-\x12extension-identity\x02\x03\0\0\x0ecapability-ref\x01B\x0a\x02\x03\x02\x01\x04\
-\x04\0\x12extension-identity\x03\0\0\x02\x03\x02\x01\x05\x04\0\x0ecapability-ref\
-\x03\0\x02\x01@\0\0\x01\x04\0\x0cget-identity\x01\x04\x01p\x03\x01@\0\0\x05\x04\0\
-\x0bget-offered\x01\x06\x04\0\x0cget-required\x01\x06\x04\0&greentic:extension-b\
-ase/manifest@0.1.0\x05\x06\x02\x03\0\0\x0fextension-error\x01B\x07\x02\x03\x02\x01\
-\x07\x04\0\x0fextension-error\x03\0\0\x01j\0\x01\x01\x01@\x01\x0bconfig-jsons\0\x02\
-\x04\0\x04init\x01\x03\x01@\0\x01\0\x04\0\x08shutdown\x01\x04\x04\0'greentic:ext\
-ension-base/lifecycle@0.1.0\x05\x08\x02\x03\0\x03\x0achannel-id\x02\x03\0\x03\x0f\
-channel-profile\x02\x03\0\x03\x05error\x01B\x14\x02\x03\x02\x01\x09\x04\0\x0acha\
-nnel-id\x03\0\0\x02\x03\x02\x01\x0a\x04\0\x0fchannel-profile\x03\0\x02\x02\x03\x02\
-\x01\x0b\x04\0\x05error\x03\0\x04\x01p\x03\x01@\0\0\x06\x04\0\x0dlist-channels\x01\
-\x07\x01j\x01\x03\x01\x05\x01@\x01\x02id\x01\0\x08\x04\0\x10describe-channel\x01\
-\x09\x01j\x01s\x01\x05\x01@\x01\x02id\x01\0\x0a\x04\0\x0dsecret-schema\x01\x0b\x04\
-\0\x0dconfig-schema\x01\x0b\x01p}\x01j\x01\x0c\x01\x05\x01@\x02\x02id\x01\x06sam\
-ple\x0c\0\x0d\x04\0\x0edry-run-encode\x01\x0e\x04\0+greentic:extension-provider/\
-messaging@0.1.0\x05\x0c\x04\09greentic:provider-aigent-gui-extension/provider-ex\
-tension\x04\0\x0b\x18\x01\0\x12provider-extension\x03\0\0\0G\x09producers\x01\x0c\
-processed-by\x02\x0dwit-component\x070.227.1\x10wit-bindgen-rust\x060.41.0";
+ty\x07\x04codes\x07messages\x04path\x08\x04\0\x0adiagnostic\x03\0\x09\x01q\x06\x0d\
+invalid-input\x01s\0\x12missing-capability\x01s\0\x11permission-denied\x01s\0\x09\
+not-found\x01s\0\x0eschema-invalid\x01s\0\x08internal\x01s\0\x04\0\x0fextension-\
+error\x03\0\x0b\x03\0#greentic:extension-base/types@0.2.0\x05\0\x01B\x08\x01m\x05\
+\x05trace\x05debug\x04info\x04warn\x05error\x04\0\x05level\x03\0\0\x01@\x03\x05l\
+evel\x01\x06targets\x07messages\x01\0\x04\0\x03log\x01\x02\x01o\x02ss\x01p\x03\x01\
+@\x04\x05level\x01\x06targets\x07messages\x06fields\x04\x01\0\x04\0\x06log-kv\x01\
+\x05\x03\0%greentic:extension-host/logging@0.1.0\x05\x01\x01B\x06\x01@\x01\x03ke\
+ys\0s\x04\0\x01t\x01\0\x01o\x02ss\x01p\x01\x01@\x02\x03keys\x04args\x02\0s\x04\0\
+\x02tf\x01\x03\x03\0\"greentic:extension-host/i18n@0.1.0\x05\x02\x01B\x13\x01s\x04\
+\0\x0achannel-id\x03\0\0\x01s\x04\0\x0atrigger-id\x03\0\x02\x01s\x04\0\x08event-\
+id\x03\0\x04\x01m\x03\x07inbound\x08outbound\x0dbidirectional\x04\0\x09direction\
+\x03\0\x06\x01m\x04\x0dtier-a-native\x11tier-b-attachment\x0ftier-c-fallback\x10\
+tier-d-text-only\x04\0\x09card-tier\x03\0\x08\x01p\x09\x01o\x02ss\x01p\x0b\x01r\x05\
+\x02id\x01\x0cdisplay-names\x09direction\x07\x0ctier-support\x0a\x08metadata\x0c\
+\x04\0\x0fchannel-profile\x03\0\x0d\x01r\x03\x02id\x03\x0cdisplay-names\x0aemit-\
+shapes\x04\0\x0ftrigger-profile\x03\0\x0f\x01r\x03\x02id\x05\x0cdisplay-names\x0d\
+payload-shapes\x04\0\x0devent-profile\x03\0\x11\x03\0'greentic:extension-provide\
+r/types@0.2.0\x05\x03\x02\x03\0\0\x12extension-identity\x02\x03\0\0\x0ecapabilit\
+y-ref\x01B\x0a\x02\x03\x02\x01\x04\x04\0\x12extension-identity\x03\0\0\x02\x03\x02\
+\x01\x05\x04\0\x0ecapability-ref\x03\0\x02\x01@\0\0\x01\x04\0\x0cget-identity\x01\
+\x04\x01p\x03\x01@\0\0\x05\x04\0\x0bget-offered\x01\x06\x04\0\x0cget-required\x01\
+\x06\x04\0&greentic:extension-base/manifest@0.2.0\x05\x06\x02\x03\0\0\x0fextensi\
+on-error\x01B\x07\x02\x03\x02\x01\x07\x04\0\x0fextension-error\x03\0\0\x01j\0\x01\
+\x01\x01@\x01\x0bconfig-jsons\0\x02\x04\0\x04init\x01\x03\x01@\0\x01\0\x04\0\x08\
+shutdown\x01\x04\x04\0'greentic:extension-base/lifecycle@0.2.0\x05\x08\x02\x03\0\
+\x03\x0achannel-id\x02\x03\0\x03\x0fchannel-profile\x01B\x14\x02\x03\x02\x01\x07\
+\x04\0\x0fextension-error\x03\0\0\x02\x03\x02\x01\x09\x04\0\x0achannel-id\x03\0\x02\
+\x02\x03\x02\x01\x0a\x04\0\x0fchannel-profile\x03\0\x04\x01p\x05\x01@\0\0\x06\x04\
+\0\x0dlist-channels\x01\x07\x01j\x01\x05\x01\x01\x01@\x01\x02id\x03\0\x08\x04\0\x10\
+describe-channel\x01\x09\x01j\x01s\x01\x01\x01@\x01\x02id\x03\0\x0a\x04\0\x0dsec\
+ret-schema\x01\x0b\x04\0\x0dconfig-schema\x01\x0b\x01p}\x01j\x01\x0c\x01\x01\x01\
+@\x02\x02id\x03\x06sample\x0c\0\x0d\x04\0\x0edry-run-encode\x01\x0e\x04\0+greent\
+ic:extension-provider/messaging@0.2.0\x05\x0b\x04\00greentic:provider-aigent-gui\
+-extension/extension\x04\0\x0b\x0f\x01\0\x09extension\x03\0\0\0G\x09producers\x01\
+\x0cprocessed-by\x02\x0dwit-component\x070.227.1\x10wit-bindgen-rust\x060.41.0";
 #[inline(never)]
 #[doc(hidden)]
 pub fn __link_custom_section_describing_imports() {

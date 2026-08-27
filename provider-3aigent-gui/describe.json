@@ -1,10 +1,16 @@
 {
-  "apiVersion": "greentic.ai/v1",
+  "$schema": "https://store.greentic.cloud/schemas/describe-v2.json",
+  "apiVersion": "greentic.ai/v2",
   "kind": "ProviderExtension",
+  "compat": {
+    "min_designer_version": ">=1.2.0",
+    "min_runner_version": "^1.2.7",
+    "contract_version": "1.2.7"
+  },
   "metadata": {
-    "id": "greentic.provider.3aigent-gui",
+    "id": "greentic.provider.aigent-gui",
     "name": "3AIgent GUI",
-    "version": "0.1.0",
+    "version": "0.2.1",
     "summary": "Greentic 3AIgent GUI Direct Line server provider",
     "author": {
       "name": "Greentic",
@@ -12,10 +18,6 @@
     },
     "license": "MIT",
     "icon": "assets/icon.svg"
-  },
-  "engine": {
-    "greenticDesigner": "*",
-    "extRuntime": "^0.1.0"
   },
   "capabilities": {
     "offered": [
@@ -27,19 +29,24 @@
     "required": []
   },
   "runtime": {
-    "component": "extension.wasm",
-    "memoryLimitMB": 32,
+    "components": {
+      "aigent-gui": {
+        "gtpack": {
+          "file": "runtime/provider.gtpack",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "pack_id": "greentic.provider.aigent-gui",
+          "component_version": "0.6.0"
+        },
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "world": "greentic:provider-aigent-gui-extension/extension@1.0.0"
+      }
+    },
     "permissions": {
       "network": [],
       "secrets": [],
       "callExtensionKinds": []
     },
-    "gtpack": {
-      "file": "runtime/provider.gtpack",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-      "pack_id": "greentic.provider.3aigent-gui",
-      "component_version": "0.6.0"
-    }
+    "memoryLimitMB": 32
   },
   "contributions": {}
 }
