@@ -1,0 +1,13 @@
+{
+  "provider.webchat.displayName": "WebChat",
+  "provider.webchat.channel.direct-line.displayName": "Direct Line",
+  "provider.webchat.channel.direct-line.description": "通过 Greentic WebChat Direct Line 服务器进行双向浏览器聊天",
+  "provider.webchat.secret.direct_line_secret.label": "Direct Line 密钥",
+  "provider.webchat.secret.direct_line_secret.help": "由 WebChat 服务器管理员颁发的密钥",
+  "provider.webchat.config.webhook_path.label": "Webhook 路径",
+  "provider.webchat.config.webhook_path.help": "Webhook 端点的路径前缀（默认 /webchat/webhook）",
+  "provider.webchat.config.bot_id.label": "机器人 ID",
+  "provider.webchat.config.bot_id.help": "此 Direct Line 端点代表的机器人的标识符",
+  "provider.webchat.config.history_window_seconds.label": "历史记录窗口（秒）",
+  "provider.webchat.config.history_window_seconds.help": "对话历史保留窗口（秒，60-86400，默认 3600）"
+}

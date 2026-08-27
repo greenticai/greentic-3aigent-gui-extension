@@ -1,0 +1,36 @@
+[workspace]
+
+[package]
+name = "greentic-provider-3aigent-gui-extension"
+version = "1.2.3-dev.0"
+edition = "2024"
+license = "MIT"
+publish = false
+description = "Greentic provider extension for 3AIgent GUI Direct Line messaging"
+
+[package.metadata.component]
+package = "greentic:provider-aigent-gui-extension"
+
+[package.metadata.component.target]
+path = "wit"
+world = "provider-extension"
+
+[package.metadata.component.target.dependencies."greentic:extension-base"]
+path = "../wit/extension-base.wit"
+
+[package.metadata.component.target.dependencies."greentic:extension-host"]
+path = "../wit/extension-host.wit"
+
+[package.metadata.component.target.dependencies."greentic:extension-provider"]
+path = "../wit/extension-provider.wit"
+
+[lib]
+crate-type = [
+    "cdylib",
+    "rlib",
+]
+path = "src/lib.rs"
+
+[dependencies]
+wit-bindgen = "0.41"
+wit-bindgen-rt = "0.41"

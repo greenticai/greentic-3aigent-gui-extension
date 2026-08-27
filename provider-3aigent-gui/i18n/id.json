@@ -1,0 +1,13 @@
+{
+  "provider.webchat.displayName": "WebChat",
+  "provider.webchat.channel.direct-line.displayName": "Direct Line",
+  "provider.webchat.channel.direct-line.description": "Percakapan dua arah via browser melalui server Greentic WebChat Direct Line",
+  "provider.webchat.secret.direct_line_secret.label": "Rahasia Direct Line",
+  "provider.webchat.secret.direct_line_secret.help": "Kunci rahasia yang dikeluarkan oleh admin server WebChat",
+  "provider.webchat.config.webhook_path.label": "Path Webhook",
+  "provider.webchat.config.webhook_path.help": "Path prefix untuk endpoint webhook (default /webchat/webhook)",
+  "provider.webchat.config.bot_id.label": "ID Bot",
+  "provider.webchat.config.bot_id.help": "Pengidentifikasi bot yang diwakili endpoint Direct Line ini",
+  "provider.webchat.config.history_window_seconds.label": "Jendela Riwayat (detik)",
+  "provider.webchat.config.history_window_seconds.help": "Jendela retensi riwayat percakapan dalam detik (60-86400, default 3600)"
+}

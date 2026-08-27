@@ -1,0 +1,17 @@
+[workspace]
+
+[package]
+name = "greentic-provider-3aigent-gui-extension-tests"
+version = "0.0.0"
+edition = "2024"
+publish = false
+description = "Schema + describe.json validation tests for greentic.provider.3aigent-gui"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+serde_json = "1"
+
+[dev-dependencies]
+jsonschema = "0.18"

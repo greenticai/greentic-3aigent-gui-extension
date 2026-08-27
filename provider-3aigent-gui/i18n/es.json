@@ -1,0 +1,13 @@
+{
+  "provider.webchat.displayName": "WebChat",
+  "provider.webchat.channel.direct-line.displayName": "Direct Line",
+  "provider.webchat.channel.direct-line.description": "Chat bidireccional en navegador a través del servidor Greentic WebChat Direct Line",
+  "provider.webchat.secret.direct_line_secret.label": "Secreto de Direct Line",
+  "provider.webchat.secret.direct_line_secret.help": "Clave secreta emitida por el administrador del servidor WebChat",
+  "provider.webchat.config.webhook_path.label": "Ruta del Webhook",
+  "provider.webchat.config.webhook_path.help": "Prefijo de ruta para el endpoint del webhook (predeterminado /webchat/webhook)",
+  "provider.webchat.config.bot_id.label": "ID del Bot",
+  "provider.webchat.config.bot_id.help": "Identificador del bot que representa este endpoint de Direct Line",
+  "provider.webchat.config.history_window_seconds.label": "Ventana de Historial (segundos)",
+  "provider.webchat.config.history_window_seconds.help": "Ventana de retención del historial de conversación en segundos (60-86400, predeterminado 3600)"
+}

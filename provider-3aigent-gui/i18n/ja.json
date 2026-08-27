@@ -1,0 +1,13 @@
+{
+  "provider.webchat.displayName": "WebChat",
+  "provider.webchat.channel.direct-line.displayName": "Direct Line",
+  "provider.webchat.channel.direct-line.description": "Greentic WebChat Direct Line サーバーを経由した双方向ブラウザチャット",
+  "provider.webchat.secret.direct_line_secret.label": "Direct Line シークレット",
+  "provider.webchat.secret.direct_line_secret.help": "WebChat サーバー管理者により発行されたシークレットキー",
+  "provider.webchat.config.webhook_path.label": "Webhook パス",
+  "provider.webchat.config.webhook_path.help": "Webhook エンドポイントのパスプレフィックス (デフォルト /webchat/webhook)",
+  "provider.webchat.config.bot_id.label": "ボット ID",
+  "provider.webchat.config.bot_id.help": "この Direct Line エンドポイントが表現するボットの識別子",
+  "provider.webchat.config.history_window_seconds.label": "履歴ウィンドウ (秒)",
+  "provider.webchat.config.history_window_seconds.help": "会話履歴の保持期間 (秒単位、60-86400、デフォルト 3600)"
+}
