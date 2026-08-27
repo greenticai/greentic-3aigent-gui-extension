@@ -9,9 +9,11 @@ Two deployment targets, same artifact:
 
 Both start from one `.gtxpack`. Build it once, then choose where it goes.
 
-> This repository has **no CI and no release workflow**. Nothing publishes on
-> merge — every step below is run by hand. That is a deliberate gap, not an
-> oversight to work around; see [`anatomy.md` §13](anatomy.md#13-open-items).
+> Most of what follows is automated. [`ci.yml`](../.github/workflows/ci.yml)
+> runs the build and validation checks on every PR, and
+> [`release.yml`](../.github/workflows/release.yml) publishes to the store when
+> `describe.json` `metadata.version` changes on `main`. Read this to understand
+> what the pipeline does, or to do it by hand.
 
 ---
 
