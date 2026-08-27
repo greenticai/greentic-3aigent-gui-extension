@@ -4,7 +4,10 @@ The 3AIgent GUI provider, packaged as a Greentic **provider extension**.
 
 A provider extension is a WASM component implementing `greentic:extension-provider`, packaged into a `.gtxpack` alongside an embedded runtime `.gtpack`. `greentic-designer` reads the extension to learn what channels exist and what config and secrets they need; `greentic-runner` executes the embedded runtime pack.
 
-To deploy it — locally or to `store.greentic.cloud` — see
+Building a provider extension from scratch — `gtdx new` through publishing —
+is walked end to end in [`docs/getting-started.md`](docs/getting-started.md).
+
+To deploy *this* extension, locally or to `store.greentic.cloud`, see
 [`docs/deploying.md`](docs/deploying.md).
 
 For a file-by-file and line-by-line reading — what every file is for, what each
