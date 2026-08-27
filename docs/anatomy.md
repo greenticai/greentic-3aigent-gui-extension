@@ -1,6 +1,6 @@
 # Anatomy of a provider extension
 
-A file-by-file and line-by-line reading of `greentic.provider.3aigent-gui`. If you
+A file-by-file and line-by-line reading of `greentic.provider.aigent-gui`. If you
 are building a *new* provider extension, this doubles as the template: every file
 here has an equivalent in the six sibling providers, and the differences between
 them are small and mechanical.
@@ -25,9 +25,9 @@ populate its UI, and the runner loads the embedded pack to move traffic.
 This split explains an otherwise puzzling piece of `src/lib.rs`:
 
 ```rust
-fn dry_run_encode(_id: String, _sample: Vec<u8>) -> Result<Vec<u8>, provider_types::Error> {
-    Err(provider_types::Error::Internal(
-        "dry-run-encode not implemented in 3AIgent GUI pilot v0.1.0".into(),
+fn dry_run_encode(_id: String, _sample: Vec<u8>) -> Result<Vec<u8>, types::ExtensionError> {
+    Err(types::ExtensionError::Internal(
+        "dry-run-encode not implemented in the 3AIgent GUI pilot".into(),
     ))
 }
 ```
@@ -45,6 +45,7 @@ pretending.
 ├── README.md
 ├── .gitignore
 ├── docs/anatomy.md                     ← this file
+├── ci/stamp-gtpack-sha.sh              ← writes the runtime digest into the manifest
 ├── scripts/verify-wit-sync.sh          ← guards the vendored WIT copies
 ├── wit/                                ← vendored contract (see §3)
 │   ├── extension-base.wit
@@ -99,14 +100,14 @@ provides:
 ```wit
 package greentic:provider-aigent-gui-extension;
 
-world provider-extension {
-  import greentic:extension-base/types@0.1.0;      // shared data types
+world extension {
+  import greentic:extension-base/types@0.2.0;      // shared data types
   import greentic:extension-host/logging@0.1.0;    // host-provided logger
   import greentic:extension-host/i18n@0.1.0;       // host-provided translation
 
-  export greentic:extension-base/manifest@0.1.0;   // identity + capabilities
-  export greentic:extension-base/lifecycle@0.1.0;  // init / shutdown
-  export greentic:extension-provider/messaging@0.1.0;  // the provider surface
+  export greentic:extension-base/manifest@0.2.0;   // identity + capabilities
+  export greentic:extension-base/lifecycle@0.2.0;  // init / shutdown
+  export greentic:extension-provider/messaging@0.2.0;  // the provider surface
 }
 ```
 
@@ -167,8 +168,8 @@ are for tooling and inspection; the component serves its own embedded copy.
 ```rust
 fn get_identity() -> types::ExtensionIdentity {
     types::ExtensionIdentity {
-        id: "greentic.provider.3aigent-gui".into(),
-        version: "0.1.0".into(),
+        id: "greentic.provider.aigent-gui".into(),
+        version: "0.2.1".into(),
         kind: types::Kind::Provider,
     }
 }
@@ -214,9 +215,9 @@ Four of the five methods share one shape: check the channel id, answer or fail.
 ```rust
 fn list_channels() -> Vec<provider_types::ChannelProfile> { vec![direct_line_profile()] }
 
-fn describe_channel(id: String) -> Result<provider_types::ChannelProfile, provider_types::Error> {
+fn describe_channel(id: String) -> Result<provider_types::ChannelProfile, types::ExtensionError> {
     if id == CHANNEL_DIRECT_LINE { Ok(direct_line_profile()) }
-    else { Err(provider_types::Error::NotFound(id)) }
+    else { Err(types::ExtensionError::NotFound(id)) }
 }
 ```
 
@@ -267,43 +268,55 @@ version gtdx publishes at** — not the version in `Cargo.toml`.
 
 ```jsonc
 {
-  "apiVersion": "greentic.ai/v1",       // manifest schema version (see §9)
+  "$schema": "https://store.greentic.cloud/schemas/describe-v2.json",
+  "apiVersion": "greentic.ai/v2",       // manifest schema version
   "kind": "ProviderExtension",
+  "compat": {                           // what host versions this works with
+    "min_designer_version": ">=1.2.0",
+    "min_runner_version": "^1.2.7",
+    "contract_version": "1.2.7"
+  },
   "metadata": {
-    "id": "greentic.provider.3aigent-gui",
+    "id": "greentic.provider.aigent-gui",
     "name": "3AIgent GUI",
-    "version": "0.1.0",                 // ← the published version
+    "version": "0.2.1",                 // ← the published version
     "summary": "...",
     "author": { "name": "Greentic", "email": "team@greentic.ai" },
     "license": "MIT",
     "icon": "assets/icon.svg"           // path inside the .gtxpack
-  },
-  "engine": {
-    "greenticDesigner": "*",            // any designer version
-    "extRuntime": "^0.1.0"              // extension-runtime semver range
   },
   "capabilities": {
     "offered":  [ { "id": "greentic:messaging/3aigent-direct-line", "version": "0.1.0" } ],
     "required": []
   },
   "runtime": {
-    "component": "extension.wasm",      // the design-time WASM
-    "memoryLimitMB": 32,
+    "components": {                     // one entry per component
+      "aigent-gui": {
+        "gtpack": {                     // the embedded runtime
+          "file": "runtime/provider.gtpack",
+          "sha256": "0000…0",           // placeholder; build.sh stamps the real one
+          "pack_id": "greentic.provider.aigent-gui",
+          "component_version": "0.6.0"  // the greentic:component WIT version
+        },
+        "sha256": "0000…0",
+        "world": "greentic:provider-aigent-gui-extension/extension@1.0.0"
+      }
+    },
     "permissions": {                    // deny-by-default sandbox
       "network": [],                    // no outbound hosts allowed
       "secrets": [],                    // reads no secrets itself
       "callExtensionKinds": []          // calls no other extensions
     },
-    "gtpack": {                         // the embedded runtime
-      "file": "runtime/provider.gtpack",
-      "sha256": "0000…0",               // placeholder; build.sh stamps the real one
-      "pack_id": "greentic.provider.3aigent-gui",
-      "component_version": "0.6.0"      // the greentic:component WIT version
-    }
+    "memoryLimitMB": 32
   },
   "contributions": {}
 }
 ```
+
+In v1 this block was flat — `runtime.component` pointed at the WASM and
+`runtime.gtpack` held the embedded pack. v2 replaces both with the
+`runtime.components` map so one extension can ship several components, each with
+its own world and digest.
 
 Two things deserve emphasis.
 
@@ -388,8 +401,11 @@ What it does, in order:
    pack it copies it in. Without it, it writes a **placeholder string** and warns.
    A placeholder build installs but cannot move a message — useful for exercising
    the install path, useless for running anything.
-7. **Stamp the digest.** Computes the sha256 of the embedded pack and rewrites
-   `runtime.gtpack.sha256` in the staged manifest.
+7. **Stamp the digest.** Computes the sha256 of the embedded pack and hands it to
+   `ci/stamp-gtpack-sha.sh`, which rewrites
+   `runtime.components.<name>.gtpack.sha256` in the staged manifest. That script
+   errors out when it finds no gtpack block rather than creating one — see §12
+   for why that guard exists.
 8. **Zip** to `greentic.provider.3aigent-gui-<version>.gtxpack`, normalising the
    `.zip` suffix some `zip` implementations append.
 
@@ -417,12 +433,13 @@ flags it.
 cd provider-3aigent-gui-tests && cargo test
 ```
 
-13 tests, all reading the sibling crate's files from disk via the `ext_dir()`
+14 tests, all reading the sibling crate's files from disk via the `ext_dir()`
 helper:
 
-- `tests/describe.rs` (4) — manifest shape: `apiVersion`, `kind`, `metadata.id`,
-  a 64-char hex `runtime.gtpack.sha256`, the `engine` range, and that the
-  `3aigent-direct-line` capability is offered.
+- `tests/describe.rs` (5) — manifest shape: `apiVersion`, `kind`, `metadata.id`,
+  a 64-char hex `runtime.components.aigent-gui.gtpack.sha256`, the `compat`
+  ranges, that the `3aigent-direct-line` capability is offered, and that no v1
+  `runtime.gtpack` / `runtime.component` / `engine` key survives.
 - `tests/schemas.rs` (9) — both schemas compile as JSON Schema and accept/reject
   representative documents.
 
@@ -469,18 +486,10 @@ signed artifact needs neither.
 
 ---
 
-## 12. Known divergences between this repo and the published extension
+## 12. The v1 → v2 migration
 
-**The repo cannot currently reproduce what is in the store.** Verified against
-`gtdx 1.2.7` and `store.greentic.cloud`:
-
-| | this repo | published |
-| --- | --- | --- |
-| `apiVersion` | `greentic.ai/v1` | `greentic.ai/v2` |
-| `metadata.id` | `greentic.provider.3aigent-gui` | `greentic.provider.aigent-gui` |
-| version | `0.1.0` | `0.2.0` |
-
-`gtdx validate` refuses the committed manifest outright:
+This extension was migrated from manifest `apiVersion greentic.ai/v1` to `v2`.
+The record matters because a current `gtdx` refuses v1 outright:
 
 ```
 Error: unsupported apiVersion: greentic.ai/v1 (expected greentic.ai/v2;
@@ -488,35 +497,65 @@ there is no in-place migration — install a v2 build of the extension, or
 re-scaffold and re-publish it with a current gtdx)
 ```
 
-So `build.sh` still produces an artifact, but nothing current will publish or
-install it. The published `0.2.0` was built from a working copy that no longer
-exists.
+What changed:
 
-The id difference is **not** explained by validation rules — `gtdx validate`
-accepts `greentic.provider.3aigent-gui` in a v2 manifest. Why the published
-artifact dropped the `3` is unresolved; reconcile it deliberately when migrating
-rather than copying either value on faith.
+| | v1 | v2 |
+| --- | --- | --- |
+| `apiVersion` | `greentic.ai/v1` | `greentic.ai/v2` |
+| host compatibility | `engine.greenticDesigner` / `engine.extRuntime` | `compat.min_designer_version` / `min_runner_version` / `contract_version` |
+| runtime | flat `runtime.component` + `runtime.gtpack` | `runtime.components` map keyed by component name |
+| WIT world | `world provider-extension` | `world extension` |
+| WIT interfaces | `@0.1.0` | `@0.2.0` (`extension-host` stayed at `0.1.0`) |
+| error type | `provider_types::Error` | `types::ExtensionError` |
 
-### What a v2 migration involves
+### The trap in the sha stamping
 
-Based on the same migration applied to the seven sibling providers:
+`build.sh` used to stamp the digest with:
 
-- `apiVersion` → `greentic.ai/v2`
-- `engine` → `compat` (`min_designer_version`, `min_runner_version`, `contract_version`)
-- `runtime.component` + `runtime.gtpack` → a `runtime.components` map keyed by
-  channel name, each entry holding `world`, `sha256` and its own `gtpack` block
-- `build.sh` line 84 must stamp
-  `.runtime.components.<name>.gtpack.sha256`, **not** `.runtime.gtpack.sha256` —
-  jq creates missing paths, so writing the old path into a v2 manifest silently
-  injects a v1-shaped field and gtdx rejects the whole document
-- `wit/world.wit`: interface versions `0.1.0` → `0.2.0`, world renamed
-  `provider-extension` → `extension`, and `world = "extension"` in `Cargo.toml`
-- `src/lib.rs`: `provider_types::Error` → `types::ExtensionError`
-- the `describe.rs` tests assert the v1 shape and must move with it
+```bash
+jq '.runtime.gtpack.sha256 = $sha'
+```
 
-### Other open items
+**jq creates missing paths.** Run against a v2 manifest that no longer has
+`runtime.gtpack`, this does not fail — it injects a fresh v1-shaped object, and
+gtdx then rejects the entire document over an unknown field. In the sibling
+repository the same line took down all seven publish jobs at once.
+
+The write now lives in `ci/stamp-gtpack-sha.sh`, which targets
+`.runtime.components.*.gtpack.sha256` and *errors* when there is no gtpack block
+to update, instead of inventing one.
+
+### The identifier change
+
+The published extension is `greentic.provider.aigent-gui`, without the `3`, so
+this repo adopted that id to stay continuous with what is already in the store.
+Note that this was **not** forced by validation — `gtdx validate` accepts
+`greentic.provider.3aigent-gui` in a v2 manifest just as readily. The id was
+matched to the published artifact deliberately; changing it back would create a
+second, parallel store entry rather than an update.
+
+### Verifying a migration
+
+```bash
+./scripts/verify-wit-sync.sh                     # vendored WIT matches upstream
+cd provider-3aigent-gui && ./build.sh            # builds, stamps, zips
+cd ../provider-3aigent-gui-tests && cargo test   # 14 tests
+unzip -q ../provider-3aigent-gui/*.gtxpack -d /tmp/x && gtdx validate /tmp/x
+```
+
+The last line is the one that matters, and it is the step that is easy to skip:
+validate the **built artifact**, not the source `describe.json`. `build.sh`
+rewrites the manifest while staging, so a source file that validates cleanly says
+nothing about what actually ships.
+
+---
+
+## 13. Open items
 
 - `assets/icon.svg` is a 388-byte placeholder. Real 3AIgent artwork is needed;
   the brand asset that exists today is a PNG.
 - `get_identity()` in `src/lib.rs` and `metadata` in `describe.json` restate the
-  same id and version with no check that they agree.
+  same id and version with no check that they agree. The sibling repository grew
+  a `ci/check-version-sync.sh` for exactly this class of drift; this repo has no
+  equivalent yet.
+- There is no CI workflow here. Every check in §12 is manual.

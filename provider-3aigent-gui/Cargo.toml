@@ -2,7 +2,7 @@
 
 [package]
 name = "greentic-provider-3aigent-gui-extension"
-version = "0.1.0"
+version = "0.2.1"
 edition = "2024"
 license = "MIT"
 publish = false
@@ -13,7 +13,7 @@ package = "greentic:provider-aigent-gui-extension"
 
 [package.metadata.component.target]
 path = "wit"
-world = "provider-extension"
+world = "extension"
 
 [package.metadata.component.target.dependencies."greentic:extension-base"]
 path = "../wit/extension-base.wit"

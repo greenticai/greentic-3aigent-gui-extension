@@ -7,7 +7,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$HERE"
 
 UPSTREAM_REPO="greentic-biz/greentic-designer-extensions"
-UPSTREAM_REV="8c619b72bd4c19cc7840b36a8ca9e0c05541430a"
+UPSTREAM_REV="154863b8b785c010bea3e91200d5c78f7a7fed7f"
 UPSTREAM_BASE="https://raw.githubusercontent.com/${UPSTREAM_REPO}/${UPSTREAM_REV}/wit"
 
 FILES=(extension-base.wit extension-host.wit extension-provider.wit)

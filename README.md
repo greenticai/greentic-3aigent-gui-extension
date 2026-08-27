@@ -12,7 +12,7 @@ this one as a template — see [`docs/anatomy.md`](docs/anatomy.md).
 
 | | |
 | --- | --- |
-| extension id | `greentic.provider.3aigent-gui` |
+| extension id | `greentic.provider.aigent-gui` |
 | channel | `direct-line` |
 | capability | `greentic:messaging/3aigent-direct-line` |
 | runtime pack | `messaging-3aigent-gui` |
@@ -35,7 +35,7 @@ ALLOW_REMOTE_COMPONENT_FETCH=0 DRY_RUN=1 \
 # 2. Here, build the extension with that runtime embedded:
 cd provider-3aigent-gui
 PROVIDER_3AIGENT_GUI_GTPACK=/path/to/messaging-3aigent-gui.gtpack ./build.sh
-# -> greentic.provider.3aigent-gui-<version>.gtxpack
+# -> greentic.provider.aigent-gui-<version>.gtxpack
 ```
 
 Set `PACK_VERSION` explicitly in step 1. Left unset, `build_packs_only.sh` falls back to the *workspace* version from the root `Cargo.toml`, which no longer tracks individual pack versions — the artifact would be stamped with the wrong version and nothing would flag it.
@@ -46,7 +46,7 @@ Without `PROVIDER_3AIGENT_GUI_GTPACK`, `build.sh` embeds a placeholder string in
 
 ```bash
 GREENTIC_EXT_ALLOW_UNSIGNED=1 gtdx install \
-  ./provider-3aigent-gui/greentic.provider.3aigent-gui-<version>.gtxpack \
+  ./provider-3aigent-gui/greentic.provider.aigent-gui-<version>.gtxpack \
   --trust loose -y
 ```
 
@@ -58,7 +58,7 @@ Builds are unsigned unless `GREENTIC_EXT_SIGNING_KEY_PEM` is set.
 cd provider-3aigent-gui-tests && cargo test
 ```
 
-13 tests validating `describe.json` and the JSON schemas.
+14 tests validating `describe.json` and the JSON schemas.
 
 ## The vendored WIT contract
 
@@ -80,4 +80,3 @@ siblings — expect to bump both.
 
 - `provider-3aigent-gui/assets/icon.svg` is a placeholder. Real 3AIgent artwork is needed; the brand asset that exists today is a PNG.
 - The WIT package name is `greentic:provider-aigent-gui-extension`, without the `3`. Every user-visible identifier keeps it. The stated reason used to be that the component-model label grammar forbids a dash-separated word beginning with a digit — that is too broad. Only the *first* character of a label is constrained: `greentic:3aigent-gui-extension` is rejected, but `greentic:provider-3aigent-gui-extension` is accepted. Dropping the `3` was not forced by the grammar.
-- The repo is at `apiVersion: greentic.ai/v1` and cannot be published or installed by a current `gtdx`, which requires v2. The published `0.2.0` also carries a different id (`greentic.provider.aigent-gui`). See [Known divergences](docs/anatomy.md#12-known-divergences-between-this-repo-and-the-published-extension).

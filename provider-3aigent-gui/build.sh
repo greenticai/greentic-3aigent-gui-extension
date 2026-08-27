@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build greentic.provider.3aigent-gui reference extension into a .gtxpack.
+# Build greentic.provider.aigent-gui reference extension into a .gtxpack.
 # Requires: rust 1.95.0 + wasm32-wasip2, cargo-component, wasm-tools, jq, zip, sha256sum.
 set -euo pipefail
 
@@ -7,7 +7,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$HERE"
 
 VERSION="$(awk -F\" '/^version/ {print $2; exit}' Cargo.toml)"
-ID="greentic.provider.3aigent-gui"
+ID="greentic.provider.aigent-gui"
 
 echo "==> validate schemas parse as JSON"
 for schema in schemas/*.schema.json; do
@@ -80,8 +80,7 @@ fi
 GTPACK_SHA="$(sha256sum "$STAGE/runtime/provider.gtpack" | awk '{print $1}')"
 echo "==> embed runtime/provider.gtpack sha256=${GTPACK_SHA}"
 
-tmp=$(mktemp)
-jq --arg sha "$GTPACK_SHA" '.runtime.gtpack.sha256 = $sha' "$STAGE/describe.json" > "$tmp" && mv "$tmp" "$STAGE/describe.json"
+bash "$HERE/../ci/stamp-gtpack-sha.sh" "$STAGE/describe.json" "$GTPACK_SHA"
 
 # Final zip
 OUT="$HERE/${ID}-${VERSION}.gtxpack"
