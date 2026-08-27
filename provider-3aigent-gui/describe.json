@@ -10,7 +10,7 @@
   "metadata": {
     "id": "greentic.provider.aigent-gui",
     "name": "3AIgent GUI",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "summary": "Greentic 3AIgent GUI Direct Line server provider",
     "author": {
       "name": "Greentic",
