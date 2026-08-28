@@ -10,7 +10,7 @@
   "metadata": {
     "id": "greentic.provider.aigent-gui",
     "name": "3AIgent GUI",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "summary": "Greentic 3AIgent GUI Direct Line server provider",
     "author": {
       "name": "Greentic",
@@ -33,6 +33,7 @@
       "aigent-gui": {
         "gtpack": {
           "file": "runtime/provider.gtpack",
+          "provider_id": "messaging-3aigent-gui",
           "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
           "pack_id": "greentic.provider.aigent-gui",
           "component_version": "0.6.0"
