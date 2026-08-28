@@ -103,15 +103,29 @@ jobs:
       - name: Versions agree before publishing
         run: bash ci/check-version-sync.sh
 
-      - name: Stage placeholder runtime gtpack + stamp its digest
+      - name: Install oras
+        uses: oras-project/setup-oras@v1
+
+      - name: Fetch the real runtime gtpack + stamp its digest
         working-directory: provider-3aigent-gui
         run: |
           set -euo pipefail
-          mkdir -p runtime
-          printf '3aigent-gui-runtime-placeholder-this-is-not-a-real-gtpack!\n' > runtime/provider.gtpack
+          bash "$GITHUB_WORKSPACE/ci/fetch-runtime-pack.sh" runtime
           SHA=$(sha256sum runtime/provider.gtpack | awk '{print $1}')
           bash "$GITHUB_WORKSPACE/ci/stamp-gtpack-sha.sh" describe.json "$SHA"
-          echo "Staged placeholder runtime; sha256=$SHA"
+
+      - name: Refuse to publish a placeholder runtime
+        working-directory: provider-3aigent-gui
+        # A placeholder installs cleanly and delivers nothing — the failure mode
+        # that looks like success. Never let one reach the store.
+        run: |
+          set -euo pipefail
+          size=$(stat -c%s runtime/provider.gtpack)
+          [ "$size" -ge 100000 ] || {
+              echo "::error::runtime/provider.gtpack is only ${size} bytes — that is a placeholder, not a pack"
+              exit 1
+          }
+          echo "OK: runtime pack is ${size} bytes"
 
       - name: Pre-install wasm32-wasip2 on Rust 1.95
         # cargo-component build inside `gtdx publish` honors rust-toolchain.toml;

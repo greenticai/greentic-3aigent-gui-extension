@@ -32,6 +32,9 @@ jobs:
 
       - uses: cargo-bins/cargo-binstall@main
 
+      - name: Install oras
+        uses: oras-project/setup-oras@v1
+
       - name: Install cargo-component + wasm-tools + gtdx
         # gtdx ships on crates.io as greentic-extension-sdk-cli. Pin the 1.2
         # line: it is the first that reads describe.json v2, and 0.4 cannot.
@@ -47,11 +50,14 @@ jobs:
       - name: describe.json / Cargo.toml / lib.rs versions agree
         run: bash ci/check-version-sync.sh
 
-      - name: Build .gtxpack
-        # No real runtime pack in CI, so build.sh embeds its placeholder. That
-        # exercises packaging and staging; it is not a runnable extension.
+      - name: Fetch the real runtime gtpack
         working-directory: provider-3aigent-gui
-        run: ./build.sh
+        run: bash "$GITHUB_WORKSPACE/ci/fetch-runtime-pack.sh" runtime
+
+      - name: Build .gtxpack
+        working-directory: provider-3aigent-gui
+        run: |
+          PROVIDER_3AIGENT_GUI_GTPACK="$PWD/runtime/provider.gtpack" ./build.sh
 
       - name: Validate the built artifact
         # Deliberately validates the unpacked .gtxpack, not the source
@@ -75,6 +81,16 @@ jobs:
               exit 1
           }
           echo "OK: runtime digest matches ($actual)"
+
+      - name: Embedded runtime is a real pack, not a placeholder
+        run: |
+          set -euo pipefail
+          size=$(stat -c%s /tmp/xp/runtime/provider.gtpack)
+          [ "$size" -ge 100000 ] || {
+              echo "FAIL: runtime/provider.gtpack is ${size} bytes — a placeholder"
+              exit 1
+          }
+          echo "OK: runtime pack is ${size} bytes"
 
       - name: Tests
         working-directory: provider-3aigent-gui-tests
