@@ -139,6 +139,10 @@ jobs:
           manifest: ./provider-3aigent-gui/Cargo.toml
           version: ${{ needs.detect.outputs.version }}
           gtdx-version: "1.2"
+          # greentic-ext-runtime refuses an extension whose describe.json
+          # carries no signature, so an unsigned publish ships something no
+          # host can load.
+          signing-key-pem: ${{ secrets.EXT_SIGNING_KEY_PEM }}
 
   verify:
     name: Verify the store, not the exit code
