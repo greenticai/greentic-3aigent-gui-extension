@@ -36,56 +36,56 @@ jobs:
       tag: ${{ steps.diff.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
 
-      - name: Diff describe.json metadata.version
+      - uses: cargo-bins/cargo-binstall@main
+
+      - name: Install gtdx
+        run: cargo binstall -y --version "^1.2" greentic-extension-sdk-cli
+
+      - name: Publish if the manifest version is not in the store
         id: diff
         shell: bash
+        env:
+          GTDX_TOKEN: ${{ secrets.GREENTIC_STORE_TOKEN }}
         run: |
           set -euo pipefail
           MANIFEST=provider-3aigent-gui/describe.json
+          EXT_ID=$(jq -r '.metadata.id' "$MANIFEST")
 
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             VERSION="${{ inputs.version }}"
             echo "==> manual dispatch for ${VERSION}"
-            echo "should_publish=true" >> "$GITHUB_OUTPUT"
-            echo "version=${VERSION}"  >> "$GITHUB_OUTPUT"
-            echo "tag=v${VERSION}"     >> "$GITHUB_OUTPUT"
-            exit 0
+          else
+            VERSION=$(jq -r '.metadata.version // empty' "$MANIFEST")
+            [ -n "$VERSION" ] || {
+              echo "::warning::no metadata.version in ${MANIFEST} — skipping"
+              echo "should_publish=false" >> "$GITHUB_OUTPUT"; exit 0
+            }
           fi
 
-          extract() {
-            git show "$1:${MANIFEST}" 2>/dev/null | jq -r '.metadata.version // empty' || echo ""
-          }
+          # Ask the store, rather than diffing against HEAD~1. A release that
+          # fails and is then fixed by a commit that does not touch the version
+          # could otherwise never publish without burning a version number.
+          gtdx registries add greentic-store https://store.greentic.cloud 2>/dev/null || true
+          PUBLISHED=$(gtdx search "$EXT_ID" --registry greentic-store 2>/dev/null \
+                      | awk -v id="$EXT_ID" '$1 == id {print $2; exit}')
+          echo "  manifest : ${VERSION}"
+          echo "  store    : ${PUBLISHED:-<none>}"
 
-          NEW=$(extract HEAD)
-          OLD=$(extract HEAD~1)
-          echo "  HEAD~1: ${OLD:-<none>}"
-          echo "  HEAD  : ${NEW:-<none>}"
-
-          if [ -z "$NEW" ]; then
-            echo "::warning::No metadata.version in HEAD ${MANIFEST} — skipping"
-            echo "should_publish=false" >> "$GITHUB_OUTPUT"
-            exit 0
+          if [ "$PUBLISHED" = "$VERSION" ]; then
+            echo "==> ${VERSION} is already in the store — skipping"
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"; exit 0
           fi
 
-          if [ "$NEW" = "$OLD" ]; then
-            echo "==> No version bump — skipping"
-            echo "should_publish=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          TAG="v${NEW}"
+          TAG="v${VERSION}"
           if git ls-remote --tags origin "refs/tags/${TAG}" | grep -q .; then
             echo "::warning::Tag ${TAG} already exists — skipping"
-            echo "should_publish=false" >> "$GITHUB_OUTPUT"
-            exit 0
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"; exit 0
           fi
 
-          echo "==> Publishing ${NEW}"
+          echo "==> Publishing ${VERSION}"
           echo "should_publish=true" >> "$GITHUB_OUTPUT"
-          echo "version=${NEW}"      >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}"  >> "$GITHUB_OUTPUT"
           echo "tag=${TAG}"          >> "$GITHUB_OUTPUT"
 
   publish:
