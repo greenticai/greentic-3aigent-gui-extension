@@ -22,5 +22,21 @@ di=$(jq -r '.metadata.id' "$EXT/describe.json")
 li=$(grep -oP 'id: "\K[^"]+' "$EXT/src/lib.rs" | head -1)
 [ "$di" = "$li" ] || { echo "FAIL: describe.json id=$di but src/lib.rs id=$li"; fail=1; }
 
+# The runtime pin is what makes the published extension carry a real pack.
+# A release that loses it would silently fall back to whatever the packaging
+# step finds — which is how the placeholder shipped for as long as it did.
+PIN="$EXT/runtime-pack.json"
+if [ ! -f "$PIN" ]; then
+  echo "FAIL: missing runtime pin $PIN"; fail=1
+else
+  pr=$(jq -r '.ref // empty' "$PIN")
+  pv=$(jq -r '.version // empty' "$PIN")
+  case "$pr" in
+    *@sha256:*) ;;
+    *) echo "FAIL: runtime-pack.json ref must pin a digest, got: ${pr:-<empty>}"; fail=1 ;;
+  esac
+  [ -n "$pv" ] || { echo "FAIL: runtime-pack.json has no version"; fail=1; }
+fi
+
 [ "$fail" -eq 0 ] || exit 1
 echo "OK: $di at $dv (describe.json, Cargo.toml and src/lib.rs agree)"

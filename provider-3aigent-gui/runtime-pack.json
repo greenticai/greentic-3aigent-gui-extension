@@ -1,0 +1,6 @@
+{
+  "_comment": "The messaging provider pack this extension ships as its runtime. Pinned by digest so a published extension is immutable; bump it here to ship a newer provider, and the designer picks it up without a repin of its own.",
+  "pack": "messaging-3aigent-gui",
+  "ref": "ghcr.io/greenticai/packs/messaging/messaging-3aigent-gui@sha256:c534dbae24a039fe7636d6dc1a3c5f26de7275c64e4005d847c704baae11e2f3",
+  "version": "0.5.23"
+}

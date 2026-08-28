@@ -71,9 +71,14 @@ if [ -n "${PROVIDER_3AIGENT_GUI_GTPACK:-}" ]; then
     fi
     echo "==> using real runtime .gtpack from PROVIDER_3AIGENT_GUI_GTPACK"
     cp "$PROVIDER_3AIGENT_GUI_GTPACK" "$STAGE/runtime/provider.gtpack"
-else
-    echo "==> WARNING: using placeholder runtime .gtpack (set PROVIDER_3AIGENT_GUI_GTPACK for real runtime)"
+elif [ "${ALLOW_PLACEHOLDER_GTPACK:-0}" = "1" ]; then
+    # Opt-in, and never reachable from a release path: a published extension
+    # carrying this instead of a real pack is the bug this branch replaced.
+    echo "==> WARNING: placeholder runtime .gtpack — this build must not be published"
     printf '3aigent-gui-runtime-placeholder-v0.1.0-this-is-not-a-real-gtpack!\n' > "$STAGE/runtime/provider.gtpack"
+else
+    echo "==> fetching the pinned runtime .gtpack (runtime-pack.json)"
+    bash "$HERE/../ci/fetch-runtime-gtpack.sh" "$STAGE/runtime/provider.gtpack" >/dev/null
 fi
 
 # Compute sha256 of embedded gtpack + rewrite describe.json in STAGE

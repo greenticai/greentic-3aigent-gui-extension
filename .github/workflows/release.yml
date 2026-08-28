@@ -103,15 +103,22 @@ jobs:
       - name: Versions agree before publishing
         run: bash ci/check-version-sync.sh
 
-      - name: Stage placeholder runtime gtpack + stamp its digest
-        working-directory: provider-3aigent-gui
+      - name: Install oras
+        uses: oras-project/setup-oras@v1
+        with:
+          version: 1.2.0
+
+      - name: Stage the pinned runtime gtpack + stamp its digest
+        # This used to write a literal placeholder string and stamp its digest,
+        # so every published extension shipped a runtime that was not a gtpack.
+        # The pack now comes from provider-3aigent-gui/runtime-pack.json, pinned
+        # by digest, and the fetch fails the release rather than substituting
+        # anything.
         run: |
           set -euo pipefail
-          mkdir -p runtime
-          printf '3aigent-gui-runtime-placeholder-this-is-not-a-real-gtpack!\n' > runtime/provider.gtpack
-          SHA=$(sha256sum runtime/provider.gtpack | awk '{print $1}')
-          bash "$GITHUB_WORKSPACE/ci/stamp-gtpack-sha.sh" describe.json "$SHA"
-          echo "Staged placeholder runtime; sha256=$SHA"
+          SHA=$(bash ci/fetch-runtime-gtpack.sh | tail -1)
+          bash ci/stamp-gtpack-sha.sh provider-3aigent-gui/describe.json "$SHA"
+          echo "Staged runtime $(jq -r .version provider-3aigent-gui/runtime-pack.json); sha256=$SHA"
 
       - name: Pre-install wasm32-wasip2 on Rust 1.95
         # cargo-component build inside `gtdx publish` honors rust-toolchain.toml;
