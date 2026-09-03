@@ -40,7 +40,7 @@ jobs:
       - uses: cargo-bins/cargo-binstall@main
 
       - name: Install gtdx
-        run: cargo binstall -y --version "^1.2" greentic-extension-sdk-cli
+        run: cargo binstall -y --version "=1.2.22" greentic-extension-sdk-cli
 
       - name: Publish if the manifest version is not in the store
         id: diff
@@ -138,7 +138,12 @@ jobs:
           store-token: ${{ secrets.GREENTIC_STORE_TOKEN }}
           manifest: ./provider-3aigent-gui/Cargo.toml
           version: ${{ needs.detect.outputs.version }}
-          gtdx-version: "1.2"
+          # Exact, not a range. `^1.2` resolved to a build whose embedded
+          # describe-v2 schema predates `contributions.messaging_channel`, so
+          # the publish died inside gtdx before it ever reached the Store:
+          #   /contributions: Additional properties are not allowed
+          # 1.2.22 is the first published build that knows the field.
+          gtdx-version: "=1.2.22"
           # greentic-ext-runtime refuses an extension whose describe.json
           # carries no signature, so an unsigned publish ships something no
           # host can load.
@@ -151,7 +156,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: cargo-bins/cargo-binstall@main
-      - run: cargo binstall -y --version "^1.2" greentic-extension-sdk-cli
+      - run: cargo binstall -y --version "=1.2.22" greentic-extension-sdk-cli
 
       - name: Store lists the new version
         # A green publish job is not proof. Today a run reported seven successful
