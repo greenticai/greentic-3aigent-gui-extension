@@ -3,9 +3,9 @@
   "apiVersion": "greentic.ai/v2",
   "kind": "ProviderExtension",
   "compat": {
-    "min_designer_version": ">=1.2.0",
+    "min_designer_version": ">=1.2.248-dev",
     "min_runner_version": "^1.2.7",
-    "contract_version": "1.2.7"
+    "contract_version": "1.2.22"
   },
   "metadata": {
     "id": "greentic.provider.aigent-gui",
@@ -48,5 +48,11 @@
     },
     "memoryLimitMB": 32
   },
-  "contributions": {}
+  "contributions": {
+    "messaging_channel": {
+      "id": "messaging-3aigent-gui",
+      "ref": "oci://ghcr.io/greenticai/packs/messaging/messaging-3aigent-gui@sha256:c534dbae24a039fe7636d6dc1a3c5f26de7275c64e4005d847c704baae11e2f3",
+      "label": "3AIgent GUI"
+    }
+  }
 }

@@ -61,3 +61,30 @@ fn describe_offers_3aigent_direct_line_capability() {
         "missing greentic:messaging/3aigent-direct-line capability"
     );
 }
+
+/// The declaration is what lets greentic-designer resolve this channel to a
+/// deployable pack without the digest being compiled into its binary. Without
+/// it the designer falls back to its own registry row, and moving a pack
+/// version means a designer source edit rather than an extension release.
+///
+/// The repository is asserted, not the digest. A digest MOVES — that is the
+/// point of owning the pin here — while the repository is fixed by the
+/// designer's same-repository rule, which refuses an override naming a
+/// different one.
+#[test]
+fn describe_declares_the_channel_it_owns() {
+    let d = describe();
+    let channel = &d["contributions"]["messaging_channel"];
+    assert!(
+        !channel.is_null(),
+        "provider-3aigent-gui must declare the channel it owns"
+    );
+    assert_eq!(channel["id"], "messaging-3aigent-gui");
+    let oci_ref = channel["ref"].as_str().expect("messaging_channel.ref");
+    assert!(
+        oci_ref.starts_with("oci://ghcr.io/greenticai/packs/messaging/messaging-3aigent-gui@sha256:"),
+        "declared ref must be a digest-pinned reference into the \
+         messaging-3aigent-gui repository, which is the only one the designer's \
+         same-repository rule accepts; got {oci_ref}"
+    );
+}
