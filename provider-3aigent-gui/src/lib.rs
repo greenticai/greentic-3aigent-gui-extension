@@ -21,7 +21,7 @@ impl manifest::Guest for Component {
     fn get_identity() -> types::ExtensionIdentity {
         types::ExtensionIdentity {
             id: "greentic.provider.aigent-gui".into(),
-            version: "0.2.5".into(),
+            version: "0.2.6".into(),
             kind: types::Kind::Provider,
         }
     }
