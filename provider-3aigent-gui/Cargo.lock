@@ -179,7 +179,7 @@ dependencies = [
 
 [[package]]
 name = "greentic-provider-3aigent-gui-extension"
-version = "0.2.6"
+version = "0.2.7"
 dependencies = [
  "wit-bindgen",
  "wit-bindgen-rt",

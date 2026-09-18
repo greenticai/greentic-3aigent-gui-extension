@@ -10,7 +10,7 @@
   "metadata": {
     "id": "greentic.provider.aigent-gui",
     "name": "3AIgent GUI",
-    "version": "0.2.6",
+    "version": "0.2.7",
     "summary": "Greentic 3AIgent GUI Direct Line server provider",
     "author": {
       "name": "Greentic",
@@ -51,7 +51,7 @@
   "contributions": {
     "messaging_channel": {
       "id": "messaging-3aigent-gui",
-      "ref": "oci://ghcr.io/greenticai/packs/messaging/messaging-3aigent-gui@sha256:f99bb3b614a0c99d30038e6251824c90f0e931eeab4c5e2b5a8e716de15b45a6",
+      "ref": "oci://ghcr.io/greenticai/packs/messaging/messaging-3aigent-gui@sha256:7ef4967f7062d8ee4d382465ca455301082733037c1a8e0a31493cfc1e83f3f2",
       "label": "3AIgent GUI"
     }
   }
